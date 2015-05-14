@@ -1,0 +1,48 @@
+@(b:Movie)
+
+@main("","Hybrid recommender",null) {
+
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
+
+
+    <h1>@b.name</h1>
+    <h2>@b.getCity - @b.getState</h2>
+
+    <div id="map_business"></div>
+
+    <script>
+
+    var map, layer;
+    var lastMarker;
+    function initialize() {
+    var mapOptions = {
+    zoom : 12,
+    center : new google.maps.LatLng ( 33.4483771, - 112.07403729 )
+    } ;
+    map = new google.maps.Map ( document.getElementById ( 'map_business' ), mapOptions ) ;
+    }
+
+    function placeMarker(position, map) {
+    if(lastMarker)
+    lastMarker.setMap(null);
+
+    var marker = new google.maps.Marker({
+    position: position,
+    map: map
+    });
+
+
+
+
+    map.setCenter(position);
+    map.panTo(position);
+    }
+
+    google.maps.event.addDomListener(window, 'load', initialize);
+
+    var posB=new google.maps.LatLng(@b.latitude,@b.longitude);
+    placeMarker(posB);
+
+
+    </script>
+}

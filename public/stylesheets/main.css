@@ -1,0 +1,87 @@
+/* custom css*/
+input[type="checkbox"]{
+    margin:4px!important;
+}
+label{
+    margin-right: 3px;
+}
+input[type="text"],input[type="number"]{
+    margin-left: 2px;
+    margin-right: 2px
+}
+#form_search1 input{
+    max-width: 120px;
+}
+#form_search1
+{
+    float:left;
+    width: 55%;
+}
+#map_canvas {
+    height: 450px;
+    width: 40%;
+    padding: 0px;
+}
+#map_business{
+
+    height: 400px;
+    width: 400px;
+}
+
+#search{
+    margin-top: 15px;
+}
+
+#categories_list{
+    float:left;
+    margin-right: 15px;
+}
+#attributes{
+    clear: both;
+    display: block;
+    float: left;
+    width: 20%;
+}
+ul.tagit{
+    float: left;
+    margin-right: 15px!important;
+    width: 70%;
+}
+#categories_section{
+    margin-bottom: 30px;
+    margin-top: 30px;
+    min-width: 75%;
+    float:right;
+}
+
+#results>table{
+    width:60%
+}
+
+.center-simple{
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+.ui-autocomplete {
+    max-height: 150px;
+    overflow-y: auto;
+    /* prevent horizontal scrollbar */
+    overflow-x: hidden;
+}
+/* IE 6 doesn't support max-height
+ * we use height instead, but this forces the menu to always be this tall
+ */
+* html .ui-autocomplete {
+    height: 100px;
+}
+
+label[for="userid"],input[name="userid"]
+{
+    float:left;
+}
+#results{
+    float:right;
+    width:80%
+}

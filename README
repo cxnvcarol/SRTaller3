@@ -1,0 +1,9 @@
+This is your new Play application
+=================================
+
+This file will be packaged with your application, when using `activator dist`.
+
+DATABASE INSTALLATION
+1. install sqlite (sudo yum install sqlite3)
+2. Create db (sqlite yelp.db + .schema + .quit)
+3. Run application, play migrates the db

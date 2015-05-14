@@ -1,0 +1,33 @@
+@(evals:List[EvaluationResult])
+
+@main("","Recommender system",null) {
+
+
+    <h1>Evaluaciones del recomendador</h1>
+
+    <table id="evaluations" class="table center-simple">
+        <thead>
+            <tr>
+                <th>Descripcion</th>
+                <th>Tiempo promedio de recomendacion</th>
+                <th>Precision</th>
+                <th>Recall</th>
+            </tr>
+        </thead>
+        <tbody id = "recommendlist">
+
+        @for( r <- evals) {
+            <tr>
+                <td>@r.description</td>
+                <td>@r.time</td>
+                <td>@r.precision</td>
+                <td>@r.recall</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+
+    <script>
+    $("#evaluations" ).html($("#evaluations" ).html().split(",").join("<br/>"))
+    </script>
+}
