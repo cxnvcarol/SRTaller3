@@ -27,45 +27,41 @@ public class User extends Model{
 	private static final long serialVersionUID = 1L;
 
     @Id
-	public String user_id;
-	public String name;
+	public long user_id;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "userfeatures")
     public List<UserFeatureRating> features;
 
-
-    public void updateFeatures() {
-        if(features==null||features.isEmpty())
-        {
-            features=new ArrayList<UserFeatureRating>();
-
-            List<SqlRow> q = Ebean
-                    .createSqlQuery(" select distinct category_category_id as cid from review join businesscategories on businesscategories.business_business_id = review.business_id where user_id=\""+user_id+"\"")
-                    .findList();
-            for (SqlRow row:q)
-            {
-                try{
-                    //fixme if not featureid found add it
-                    //fixme then sum the rating for this movie
-                    //features.add(Feature.finder.byId(row.getLong("cid")));
-                }
-                catch(Exception ex){}
-
-            }
-            this.update();
-        }
-
+    public User()
+    {
+        if(features==null)
+            features=new ArrayList<>();
     }
 
-    public String[] getFeaturesStr() {
+    public static Finder<Long, User> find = new Finder<Long, User>(
+            Long.class, User.class
+    );
 
-        updateFeatures();
-        String ansa="";
-        for (UserFeatureRating c:features)
-        {
-            ansa+=","+c.feature.getName();
+    public void setOrUpdateFeature(Feature f,double rating) {
+
+        ////for each feature review if exists in the user, if not add it
+        //add the rating to the added feature.
+        boolean encontro=false;
+        UserFeatureRating fuser=null;
+        for (int i = 0; i < features.size() && !encontro; i++) {
+            fuser=features.get(i);
+            if(fuser.feature.id==f.id)
+            {
+                encontro=true;
+            }
         }
-        return ansa.length()==0?new String[0]:ansa.substring(1).split(",");
+        if(!encontro)
+        {
+            fuser=new UserFeatureRating();
+            fuser.feature=f;
+            features.add(fuser);
+        }
+        fuser.addRating(rating);
     }
 }

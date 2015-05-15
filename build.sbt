@@ -1,4 +1,4 @@
-name := """SRTaller2"""
+name := """SRTaller3"""
 
 version := "1.0-SNAPSHOT"
 

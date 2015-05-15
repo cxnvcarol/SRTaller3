@@ -2,7 +2,7 @@ package controllers;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.SqlRow;
-import models.Business;
+import models.Movie;
 import models.Recommendation;
 import models.User;
 import org.json.simple.JSONObject;
@@ -31,7 +31,7 @@ public class Application extends Controller {
         }
 
         if(uid!=null&&!uid.isEmpty())
-            return User.find.byId(uid);
+            return User.find.byId(Long.parseLong(uid));
         return null;
     }
     public static Result randomUserId()
@@ -52,7 +52,7 @@ public class Application extends Controller {
 
         User logged=getLoggedUser();
         if(logged!=null)
-            response().setCookie("user_id",logged.getUser_id());
+            response().setCookie("user_id",""+logged.user_id);
 
         return ok(index.render(logged));//"Hybrid recommender system"));
     }
@@ -79,7 +79,7 @@ public class Application extends Controller {
         }
         if(!user_id.isEmpty()) {
             try {
-                logged = User.find.byId(user_id);
+                logged = User.find.byId(Long.parseLong(user_id));
             }
             catch(Exception e)
             {
@@ -105,7 +105,7 @@ public class Application extends Controller {
         }
         if(!user_id.isEmpty()) {
             try {
-                logged = User.find.byId(user_id);
+                logged = User.find.byId(Long.parseLong(user_id));
             }
             catch(Exception e)
             {
@@ -121,8 +121,8 @@ public class Application extends Controller {
 
 
         String[] categoriesList=new String[0];
-        if(logged!=null)
-            categoriesList=logged.getCategoriesStr();
+        //if(logged!=null)
+            //categoriesList=logged.getCategoriesStr();//fixme
 
         ArrayList<String> cstr=new ArrayList<String>();
         for (String cs:categoriesList)
@@ -220,7 +220,7 @@ public class Application extends Controller {
         }
         if(!user_id.isEmpty()) {
             try {
-                logged = User.find.byId(user_id);
+                logged = User.find.byId(Long.parseLong(user_id));
             }
             catch(Exception e)
             {
@@ -240,8 +240,8 @@ public class Application extends Controller {
 
         //
 
-        if((categoriesList==null||categoriesList.length==0)&&logged!=null)
-            categoriesList=logged.getCategoriesStr();
+        //if((categoriesList==null||categoriesList.length==0)&&logged!=null)
+            //categoriesList=logged.getCategoriesStr();//fixme
 
         ArrayList<String> cstr=new ArrayList<String>();
         for (String cs:categoriesList)
@@ -253,8 +253,15 @@ public class Application extends Controller {
     }
 
 
-    public static Result getBusiness(String id) {
+    public static Result getMovie(String id) {
         JSONObject jo=new JSONObject();
-        return ok(business.render(Business.find.byId(id)));
+        return ok(movie.render(Movie.find.byId(Long.parseLong(id))));
+    }
+
+    public static Result loadAll() {
+        DataThread dthread=new DataThread();
+        dthread.start();
+        return ok("Data loading adressed...");
     }
 }
+

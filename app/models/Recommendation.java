@@ -23,7 +23,7 @@ public class Recommendation {
         this.estimatedRating = estimatedRating;
     }
 
-    public Movie getBusiness() {
+    public Movie getMovie() {
         return movie;
     }
 

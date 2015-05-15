@@ -1,6 +1,5 @@
 package recommender;
 
-import models.Business;
 import models.EvaluationResult;
 import models.Recommendation;
 import models.User;
@@ -16,14 +15,7 @@ public class HybridRecommender {
 	private static HybridRecommender instance;
     private static CollaborativeRecommender colaborativo;
     private static ContentRecommender contenido;
-    
-    public static void main(String [] args)
-    {
-   	 	User user = new User();
-   	 	user.setUser_id("uMKK1Ans4DrUsxlliIH_xA");
 
-   	 	recommend(null, null, user, null, null);
-    }
     
     public HybridRecommender()
     {
@@ -33,17 +25,10 @@ public class HybridRecommender {
 
     public static ArrayList<Recommendation> recommend(double[] latlong,String hour, User user,String[] categories,String[] attributes)
     {
-    	//TODO filtrar por posicion y horas
-        if(latlong!=null && latlong.length==2)
-            System.out.println("latlong: ["+latlong[0]+","+latlong[1]+"]");
-    	ArrayList<Business> cercanos = LocationFilter.obtenerSitiosCercanos(latlong[0], latlong[1], RADIO_FILTRO);
-    	colaborativo.generateDataModelPositionBased(cercanos);
-    	//colaborativo.generateDataModel();
-    	
-    	contenido.setFilteredBusinessGeo(cercanos);
-    	
+
     	//TODO generate the new dataModels
-    	ArrayList<Recommendation> collabRecs = getCollaborativeRecommendations( latlong,hour,  user==null?"":user.user_id, categories,attributes);
+    	//ArrayList<Recommendation> collabRecs = getCollaborativeRecommendations( latlong,hour,  user==null?"":user.user_id, categories,attributes);
+        ArrayList<Recommendation> collabRecs =new ArrayList<>();
     	ArrayList<Recommendation> contentRecs = getContentRecommendations(latlong, hour, user, categories, attributes);
         
     	ArrayList<Recommendation> finalRecs = new ArrayList<Recommendation>();
@@ -64,8 +49,8 @@ public class HybridRecommender {
     		for( int j = 0 ; j<contentRecs.size() && !termino ; j ++){
     			Recommendation content = contentRecs.get(j);
     			
-    			if(content.getBusiness()!=null){
-	    			if(collab.getBusiness().business_id.equals(content.getBusiness().business_id)){
+    			if(content.getMovie()!=null){
+	    			if(collab.getMovie().id==content.getMovie().id){
 	    				//Promedio de posicion entre las dos listas
 	    				posIntro = (i+j)/2;
 	    				contentRecs.set(j, null);
@@ -97,7 +82,7 @@ public class HybridRecommender {
     	}
     	
     	for(int i = 0; i< finalRecs.size() ; i++){
-    		System.out.println(finalRecs.get(i).business.name);
+    		System.out.println(finalRecs.get(i).movie.title);
     	}
     	return finalRecs;
         //return collabRecs;
@@ -112,14 +97,14 @@ public class HybridRecommender {
 			respuesta = false;
 		else if(finalRecs.get(posIntro)==null){
 			finalRecs.set(posIntro, rec);
-			System.out.println("Added Antes: "+rec.business.name+" en "+posIntro);
+			System.out.println("Added Antes: "+rec.movie.title+" en "+posIntro);
 			respuesta = true;
 		}
 		else{
 			termino = introducirAntes(finalRecs.get(posIntro), posIntro-1, finalRecs);
 			if(termino){
 				finalRecs.set(posIntro, rec);
-				System.out.println("Added Antes 2: "+rec.business.name+" en "+posIntro);
+				System.out.println("Added Antes 2: "+rec.movie.title+" en "+posIntro);
 				respuesta = true;
 			}
 			else
@@ -131,7 +116,7 @@ public class HybridRecommender {
     private static boolean introducirDespues(Recommendation rec, int posIntro, ArrayList<Recommendation> finalRecs) {
 		try{
 			finalRecs.add(posIntro, rec);
-			System.out.println("Added Despues: "+rec.business.name+" en "+posIntro);
+			System.out.println("Added Despues: "+rec.movie.title+" en "+posIntro);
 			return true;
 		}catch(Exception e){
 			e.printStackTrace();
@@ -142,7 +127,9 @@ public class HybridRecommender {
 	private static ArrayList<Recommendation> getContentRecommendations(double[] latlong, String hour, User user, String[] categories,String[] attributes) {
 		ArrayList<Recommendation> returned = new ArrayList<Recommendation>();
 //    	
-    	returned = contenido.recommend(latlong,hour,user,categories,attributes);
+    	//returned = contenido.recommend(latlong,hour,user,categories,attributes);
+        //TODO
+        returned=contenido.recommend(user,null);
     	return returned;
 	}
 

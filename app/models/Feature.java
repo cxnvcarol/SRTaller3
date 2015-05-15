@@ -25,11 +25,10 @@ public class Feature extends Model{
     @Id
     @GeneratedValue
 	public long id;
-	
 	public String name;
+    public String type;
 
-
-    public static Finder<Long, Feature> finder = new Finder<Long, Feature>(
+    public static Finder<Long, Feature> find = new Finder<Long, Feature>(
             Long.class, Feature.class
     );
 
@@ -61,7 +60,7 @@ public class Feature extends Model{
     public static List<String> getAll()
     {
 
-        List<Feature> r = Feature.finder.select("name").findList();
+        List<Feature> r = Feature.find.select("name").findList();
 
         List<String> strings= new ArrayList<String>();
         for (Feature c:r)

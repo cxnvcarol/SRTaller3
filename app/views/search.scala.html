@@ -49,9 +49,9 @@
 
                 @for( r <- items) {
                     <tr>
-                        <td>@r.business.name</td>
+                        <td>@r.movie.title</td>
                         <td>@r.estimatedRating</td>
-                        <td><a target="_blank" href="/movie/@r.getBusiness().getBusiness_id">+</a></td>
+                        <td><a target="_blank" href="/movie/@r.getMovie().id">+</a></td>
                     </tr>
                 }
             </tbody>

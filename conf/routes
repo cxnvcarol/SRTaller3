@@ -5,16 +5,14 @@
 # Home page
 GET         /                    controllers.Application.index()
 POST        /index               controllers.Application.indexPost()
-GET         /data                controllers.SemantriaController.loadData()
-GET         /semantria           controllers.SemantriaController.index()
-GET         /sentiment           controllers.SemantriaController.sentiment()
 GET         /evaluation          controllers.EvaluationController.evaluation()
 
 POST        /search              controllers.Application.search()
 GET         /search              controllers.Application.searchGet()
 GET         /randomuser          controllers.Application.randomUserId()
 
-GET         /business/:id 	     controllers.Application.getBusiness(id: String)
+GET         /movie/:id           controllers.Application.getMovie(id: String)
+POST        /loadall            controllers.Application.loadAll()
 
 
 
