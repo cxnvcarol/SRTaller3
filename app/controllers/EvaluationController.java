@@ -10,6 +10,7 @@ import views.html.evaluation;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 import models.EvaluationResult;
 
@@ -196,7 +197,9 @@ public class EvaluationController extends Controller {
 
 
     public static Result evaluation() {
-        ArrayList<EvaluationResult> evals = new ArrayList<EvaluationResult>();
+
+
+        List<EvaluationResult> evals = new ArrayList<EvaluationResult>();
         //evals.addAll(evaluateRecommenders());
         evals = getPrecalculatedEvaluations();
 

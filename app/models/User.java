@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package models;
 
@@ -8,6 +8,7 @@ import java.util.List;
 import javax.persistence.*;
 
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.Filter;
 import com.avaje.ebean.SqlRow;
 import com.avaje.ebean.annotation.ConcurrencyMode;
 import com.avaje.ebean.annotation.EntityConcurrencyMode;
@@ -21,16 +22,15 @@ import play.db.ebean.Model;
 @Entity
 public class User extends Model{
 
-	/**
-	 * Default Serial Version ID
-	 */
-	private static final long serialVersionUID = 1L;
+    /**
+     * Default Serial Version ID
+     */
 
     @Id
-	public long user_id;
+    public long user_id;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "userfeatures")
+
+    @Transient
     public List<UserFeatureRating> features;
 
     public User()
@@ -42,6 +42,37 @@ public class User extends Model{
     public static Finder<Long, User> find = new Finder<Long, User>(
             Long.class, User.class
     );
+
+    public List<UserFeatureRating> getFeatures()
+    {
+        if(features.size()==0)
+            updateFeatures();
+        return features;
+    }
+
+
+    public void updateFeatures()
+    {
+        if(features.size()>0)
+            return;
+        List<Rating> myratings =
+                Ebean.find(Rating.class)
+                        .where().eq("userid", user_id)
+                        .findList();
+
+        for(Rating r:myratings)
+        {
+            Movie m=Movie.find.byId(r.movieid);
+
+            if(m!=null)
+            {
+                for(Feature f:m.features)
+                {
+                    setOrUpdateFeature(f, r.rating);
+                }
+            }
+        }
+    }
 
     public void setOrUpdateFeature(Feature f,double rating) {
 

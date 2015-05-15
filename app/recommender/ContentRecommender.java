@@ -1,5 +1,6 @@
 package recommender;
 
+import models.EvaluationResult;
 import models.Recommendation;
 import models.User;
 
@@ -20,5 +21,9 @@ public class ContentRecommender {
 
     public ArrayList<Recommendation> recommend(User user, Object o) {
         return new ArrayList<>();
+    }
+
+    public EvaluationResult evaluate(boolean b, int i, double v, int i1, int i2) {
+        return new EvaluationResult();
     }
 }

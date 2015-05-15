@@ -2,6 +2,7 @@ package recommender;
 
 import java.io.*;
 import java.util.*;
+import java.util.regex.Pattern;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.SqlQuery;
@@ -35,10 +36,11 @@ public class DataLoader {
     }
 
     private static void loadRatings() throws IOException {
-        if(Rating.find.all().size()==0)
+        if(Rating.find.all().size()>0)
         {
             return;
         }
+        System.out.println("loading ratings");
         //userId,movieId,rating,timestamp
         BufferedReader br=new BufferedReader(new FileReader(RATINGS_PATH));
         String ln=br.readLine();
@@ -59,16 +61,7 @@ public class DataLoader {
                 found.user_id=r.userid;
                 found.save();
             }
-            Movie m=Movie.find.byId(r.movieid);
 
-            if(m!=null)
-            {
-                for(Feature f:m.features)
-                {
-                    found.setOrUpdateFeature(f,r.rating);
-                }
-                m.save();
-            }
         }
     }
 
@@ -76,6 +69,7 @@ public class DataLoader {
     {
         if(Feature.find.all().size()>0)
             return;
+        System.out.println("loading features");
         loadGenres();
         //loadDirectors();//etc,etc...
 
@@ -98,6 +92,7 @@ public class DataLoader {
         {
             return;
         }
+        System.out.println("loading movies");
         BufferedReader br=new BufferedReader(new FileReader(MOVIES_PATH));
         String ln=br.readLine();
         while((ln=br.readLine())!=null)
@@ -119,7 +114,7 @@ public class DataLoader {
                 name=partes[1];
                 genresM=partes[2];
             }
-            String[] partesGenres=genresM.split("|");
+            String[] partesGenres=genresM.split(Pattern.quote("|"));
             Movie newM=new Movie();
             newM.id=idMov;
             newM.title=name;
@@ -140,43 +135,8 @@ public class DataLoader {
 
     private static void generateContentModel() {
         //TODO fixme
-        try {
-            List<SqlRow> q = Ebean.createSqlQuery("select count(*) as count from item_content").findList();
-            SqlQuery qtemp = Ebean
-                    .createSqlQuery(" select * from businesscategories");
-            qtemp.setMaxRows(200000);
 
-            List<SqlRow> q2 = qtemp
-                    .findList();
-            System.out.println("\nATTENTION... THERE ARE "+q2.size()+" ROWS IN BUSINESSCATEGORIES....\n");
-
-            if(q.get(0).getInteger("count")>0)
-                return;
-        }
-        catch(Exception e)
-        {
-            //does not exist
-        }
-
-        SqlQuery sqlQuery = Ebean.createSqlQuery(" select * from businesscategories");
-        sqlQuery.setMaxRows(3000000);
-
-        List<SqlRow> q2 = sqlQuery
-                .findList();
-
-        MemoryIDMigrator thing2long = new MemoryIDMigrator();
-
-        for (SqlRow row:q2)
-        {
-            try{
-                String sid=row.getString("business_business_id");
-                ItemContent ic=new ItemContent(sid,thing2long.toLongID(sid),row.getInteger("category_category_id"),1);
-                ic.save();
-            }
-            catch(Exception ex){
-                ex.printStackTrace();
-            }
-        }
+        System.out.println("generating content model");
 
     }
 }

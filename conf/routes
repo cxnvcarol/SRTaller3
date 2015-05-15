@@ -12,7 +12,7 @@ GET         /search              controllers.Application.searchGet()
 GET         /randomuser          controllers.Application.randomUserId()
 
 GET         /movie/:id           controllers.Application.getMovie(id: String)
-POST        /loadall            controllers.Application.loadAll()
+GET        /loadall            controllers.Application.loadAll()
 
 
 

@@ -13,6 +13,7 @@ import play.mvc.*;
 import views.html.*;
 import recommender.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -116,7 +117,7 @@ public class Application extends Controller {
         response().setCookie("user_id",user_id);
 
 
-        ArrayList<Recommendation> items = new ArrayList<Recommendation>();//avoid recommend with get!
+        List<Recommendation> items = new ArrayList<Recommendation>();//avoid recommend with get!
         // /HybridRecommender.getInstance().recommend(null, null, logged, null, null);
 
 
@@ -243,7 +244,7 @@ public class Application extends Controller {
         //if((categoriesList==null||categoriesList.length==0)&&logged!=null)
             //categoriesList=logged.getCategoriesStr();//fixme
 
-        ArrayList<String> cstr=new ArrayList<String>();
+        List<String> cstr=new ArrayList<String>();
         for (String cs:categoriesList)
         {
             cstr.add(cs);
@@ -259,8 +260,14 @@ public class Application extends Controller {
     }
 
     public static Result loadAll() {
-        DataThread dthread=new DataThread();
-        dthread.start();
+        //DataThread dthread=new DataThread();
+        //dthread.start();
+        DataLoader dl=new DataLoader();
+        try {
+            dl.loadAllDB();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return ok("Data loading adressed...");
     }
 }

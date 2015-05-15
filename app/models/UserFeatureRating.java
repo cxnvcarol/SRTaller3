@@ -1,14 +1,13 @@
 package models;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 /**
  * Created by carol on 14/05/15.
  */
-@Entity
 public class UserFeatureRating {
-    @Id
     public Feature feature;
     public double cumulativeRating;
     private int countRating;
@@ -24,7 +23,5 @@ public class UserFeatureRating {
     public void addRating(double rating) {
         countRating++;
         cumulativeRating+=rating;
-
-
     }
 }
