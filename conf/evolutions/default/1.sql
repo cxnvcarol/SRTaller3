@@ -22,6 +22,8 @@ create table movie (
   imdb_id                   bigint,
   dbpedia_uri               varchar(255),
   title                     varchar(255),
+  num_ratings               integer,
+  average_rating            double,
   constraint pk_movie primary key (id))
 ;
 

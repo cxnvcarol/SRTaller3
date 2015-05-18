@@ -73,7 +73,7 @@
         <div id="setUser" title="Cambiar usuario actual">
             <p class="validateTips">(Vacío como visitante)</p>
 
-            <form method="post" action="/index" id="updateuser">
+            <form method="get" action="/" id="updateuser">
                 <fieldset>
                     <label for="userid">Id usuario:</label>
                     <input type="text" name="userid" id="userid" value="@if(u!=null){@u.user_id}" class="text ui-widget-content ui-corner-all">

@@ -1,3 +1,9 @@
+#model_preferences
+{
+    display: none;
+    width: 0;
+}
+
 /* custom css*/
 input[type="checkbox"]{
     margin:4px!important;
@@ -83,5 +89,5 @@ label[for="userid"],input[name="userid"]
 }
 #results{
     float:right;
-    width:80%
+    width:90%
 }
