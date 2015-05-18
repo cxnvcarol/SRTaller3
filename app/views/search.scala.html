@@ -1,37 +1,21 @@
-@(msg:String,us:User,items:List[Recommendation],categs:List[String])
+@(msg:String,us:User,items:List[Recommendation])
 @import play.api.libs.json.Json
 
 @main(msg,"Hybrid Recommender",us) {
 
 
-    <h1 class="text-center center-block">Tus lugares recomendados</h1>
-    <form id="searchForm" method="POST" action="/search">
+    <h1 class="text-center center-block">Las películas para tí</h1>
+    <form id="searchForm" method="GET" action="/search">
         <input type="hidden" name="user_id" value="@if(us!=null){@us.user_id}" />
     <section id="categories_section">
 
-    <label for="categories" style="float:left">Categorías: </label>
-
-
-
-    <input id="categories_selected" name="categories"  placeholder="Escribe posibles categorías"/>
-
-    <button id="btn_search" type="submit">Recomendar</button>
-    <button id="btn_cleantags">Limpiar</button>
     </section>
     <br/>
 
-    <div id="attributes" class="text-center">
+    <div id="model_preferences" class="text-center">
         <h4>¿Aún no? refina tus preferencias:</h4>
-        <div id="attributes_list">
-            <div>
-                <input type="checkbox" id="attr_24hours" name="attributes"><label for="attr_24hours">24 hours</label>
-            </div>
-            <div>
-                <input type="checkbox" id="attr_domicile" name="attributes"><label for="attr_domicile">Domicile</label>
-            </div>
-            <div>
-                <input type="checkbox" id="attr_economic" name="attributes"><label for="attr_economic">Economic</label>
-            </div>
+        <div id="preferences_list">
+            <!-- TODO coeficientes editables de género, director, productor, etc...-->
         </div>
     </div>
 
@@ -40,7 +24,7 @@
         <table class="table center-simple">
             <thead>
                 <tr>
-                    <th>Negocio</th>
+                    <th>Película</th>
                     <th>Estimación</th>
                     <th>Ver más</th>
                 </tr>
@@ -61,14 +45,6 @@
 
 
     <script type="text/javascript">
-    var sampleTags = "@Feature.getAll()";
-    sampleTags = sampleTags.substring(1, sampleTags.length - 2).split(",");
-    $("#categories_selected").tagit({
-    //availableTags: sampleTags,
-    caseSensitive: false,
-    allowSpaces: true//,showAutocompleteOnFocus:true
-    });
-
 
     function split(val) {
     return val.split(/,\s*/);
@@ -78,56 +54,6 @@
     return split(term).pop();
     }
 
-    //$( "#categories_section .tagit-new>input" ).replaceWith( "<input id='newtag' />" );
-    $("#categories_section .tagit-new>input").hide();
-    $("#categories_section .tagit-new>input").parent().append("<input id='tags2' type='text' class='ui-widget-content'/>");
-
-    $("#tags2")
-    //$( "#newtag")
-    // don't navigate away from the field on tab when selecting an item
-    .bind("keydown", function (event) {
-    if (event.keyCode === $.ui.keyCode.TAB &&
-    $(this).autocomplete("instance").menu.active) {
-    event.preventDefault();
-    }
-    })
-    .autocomplete({
-    minLength: 0,
-    source: function (request, response) {
-    // delegate back to autocomplete, but extract the last term
-    response($.ui.autocomplete.filter(
-    sampleTags, extractLast(request.term)));
-    },
-    focus: function () {
-    // prevent value inserted on focus
-    return false;
-    },
-    select: function (event, ui) {
-    var terms = split(this.value);
-    // remove the current input
-    terms.pop();
-    // add the selected item
-    terms.push(ui.item.value);
-
-    $("#categories_selected").tagit("createTag", ui.item.value);
-    //$( "#tags2" ).val("");
-    // add placeholder to get the comma-and-space at the end
-    terms.push("");
-
-    this.value = "";
-    return false;
-    }
-    });
-
-    $('#btn_cleantags').click(function () {
-    $("#categories_selected").tagit("removeAll");
-        return false;
-    });
-        //preload categories by user
-        @for(c<-categs){
-        $("#categories_selected").tagit("createTag", "@Html(c)");
-    }
-        
     </script>
 
 

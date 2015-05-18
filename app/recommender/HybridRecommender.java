@@ -1,10 +1,13 @@
 package recommender;
 
 import models.EvaluationResult;
+import models.Movie;
 import models.Recommendation;
 import models.User;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by carol on 8/04/15.
@@ -15,6 +18,7 @@ public class HybridRecommender {
 	private static HybridRecommender instance;
     private static CollaborativeRecommender colaborativo;
     private static ContentRecommender contenido;
+    public static final int MAX_RECOMMENDATIONS = 20;
 
     
     public HybridRecommender()
@@ -23,13 +27,17 @@ public class HybridRecommender {
     	contenido =  ContentRecommender.getInstance();
     }
 
-    public static ArrayList<Recommendation> recommend(double[] latlong,String hour, User user,String[] categories,String[] attributes)
+    public static ArrayList<Recommendation> recommend(User user)
     {
+        if(user==null)
+        {
+            return popularMovies(MAX_RECOMMENDATIONS);
+        }
 
-    	//TODO generate the new dataModels
-    	//ArrayList<Recommendation> collabRecs = getCollaborativeRecommendations( latlong,hour,  user==null?"":user.user_id, categories,attributes);
-        ArrayList<Recommendation> collabRecs =new ArrayList<>();
-    	ArrayList<Recommendation> contentRecs = getContentRecommendations(latlong, hour, user, categories, attributes);
+    	//TODO reponderar modelos
+    	ArrayList<Recommendation> collabRecs = getCollaborativeRecommendations( user==null?0:user.user_id);
+        //ArrayList<Recommendation> collabRecs =new ArrayList<>();
+    	ArrayList<Recommendation> contentRecs = getContentRecommendations(user);
         
     	ArrayList<Recommendation> finalRecs = new ArrayList<Recommendation>();
     	int ultimaPos=collabRecs.size()+contentRecs.size();
@@ -88,8 +96,21 @@ public class HybridRecommender {
         //return collabRecs;
     }
 
+    private static ArrayList<Recommendation> popularMovies(int maxRecommendations) {
+        ArrayList<Recommendation> returned=new ArrayList<>();
+        List<Movie> listMovies = Movie.find.all();
+        Movie[] allMovies = listMovies.toArray(new Movie[listMovies.size()]);
+        Arrays.sort(allMovies);
 
-	private static boolean introducirAntes(Recommendation rec, int posIntro, ArrayList<Recommendation> finalRecs) {
+        for (int i = Math.max(0,(allMovies.length-maxRecommendations)); i < allMovies.length; i++) {
+            returned.add(new Recommendation(allMovies[i],allMovies[i].average_rating));
+        }
+
+        return returned;
+    }
+
+
+    private static boolean introducirAntes(Recommendation rec, int posIntro, ArrayList<Recommendation> finalRecs) {
 		boolean termino = false;
 		boolean respuesta = false;
 		
@@ -124,22 +145,21 @@ public class HybridRecommender {
 		}
 	}
 
-	private static ArrayList<Recommendation> getContentRecommendations(double[] latlong, String hour, User user, String[] categories,String[] attributes) {
+	private static ArrayList<Recommendation> getContentRecommendations(User user) {
 		ArrayList<Recommendation> returned = new ArrayList<Recommendation>();
 //    	
-    	//returned = contenido.recommend(latlong,hour,user,categories,attributes);
+
         //TODO
-        returned=contenido.recommend(user,null);
+        returned=contenido.recommend(user);
     	return returned;
 	}
 
-	private static ArrayList<Recommendation> getCollaborativeRecommendations(
-			double[] latlong, String hour, String user_id, String[] categories,
-			String[] attributes) {
+	private static ArrayList<Recommendation> getCollaborativeRecommendations(long user_id) {
+        //TODO
 		int neighbors = 10;
 		int similarityMethod = CollaborativeRecommender.EUCLIDEAN;
 
-        if(user_id==null||user_id.equals(""))
+        if(user_id==0)
             return new ArrayList<Recommendation>();
 		return colaborativo.executeRecommender(user_id, (int)CollaborativeRecommender.MAX_RECOMMENDATIONS, neighbors, similarityMethod);
 	}

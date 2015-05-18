@@ -1,20 +1,16 @@
 package recommender;
 
 import java.io.*;
-import java.util.*;
 import java.util.regex.Pattern;
 
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.SqlQuery;
-import com.avaje.ebean.SqlRow;
 import models.*;
-
-import org.apache.mahout.cf.taste.impl.model.MemoryIDMigrator;
 
 public class DataLoader {
 
-   private static final String MOVIES_PATH = "./data/movies.csv";
-    private static final String RATINGS_PATH = "./data/ratings.csv";
+	//private static final String MOVIES_PATH = "./data/movies.csv";
+    //private static final String RATINGS_PATH = "./data/ratings.csv";
+    private static final String MOVIES_PATH = "./data/movies.dat";
+    private static final String RATINGS_PATH = "./data/ratings.dat";
 
     private static String[] genres={"Action","Adventure","Animation","Children's","Comedy","Crime","Documentary","Drama","Fantasy","Film-Noir","Horror","Musical","Mystery","Romance","Sci-Fi","Thriller","War","Western"};
 	//user,movie,rating,timestamp
@@ -28,7 +24,7 @@ public class DataLoader {
         loadFeatures();
         loadMovies();
         loadRatings();//load table with movies and ratings, and feed table with features of user
-        generateContentModel();
+        generateContentModel();//TODO not sure what should be here
     }
 
     private static void loadRatings() throws IOException {
@@ -41,7 +37,8 @@ public class DataLoader {
         BufferedReader br=new BufferedReader(new FileReader(RATINGS_PATH));
         String ln=br.readLine();
         while((ln=br.readLine())!=null) {
-            String[] partes=ln.split(",");
+            //String[] partes=ln.split(",");
+            String[] partes=ln.split("::");
             Rating r=new Rating();
             r.userid=Long.parseLong(partes[0]);
             r.movieid=Long.parseLong(partes[1]);
@@ -56,6 +53,13 @@ public class DataLoader {
                 found=new User();
                 found.user_id=r.userid;
                 found.save();
+            }
+
+            Movie m=Movie.find.byId(r.movieid);
+            if(m!=null)
+            {
+                m.addRating(r.rating);
+                m.save();
             }
 
         }
@@ -93,7 +97,8 @@ public class DataLoader {
         String ln=br.readLine();
         while((ln=br.readLine())!=null)
         {
-            String[] partes=ln.split(",");//id,nombre,géneros (sep x |)
+            //String[] partes=ln.split(",");//id,nombre,géneros (sep x |)
+            String[] partes=ln.split("::");
             long idMov=Long.parseLong(partes[0]);
             String name,genresM;
             if(partes.length>3)
@@ -131,6 +136,8 @@ public class DataLoader {
 
     private static void generateContentModel() {
         //TODO fixme
+        //Use ratings with last dates! (window of max_ratins(1month,N_RATINGS)
+        //Get features for users (movie features are static9
 
         System.out.println("generating content model");
 

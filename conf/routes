@@ -3,18 +3,16 @@
 # ~~~~
 
 # Home page
-GET         /                    controllers.Application.index()
-POST        /index               controllers.Application.indexPost()
-GET         /evaluation          controllers.EvaluationController.evaluation()
+GET        /                    controllers.Application.searchGet()
+GET        /evaluation          controllers.EvaluationController.evaluation()
 
-POST        /search              controllers.Application.search()
-GET         /search              controllers.Application.searchGet()
-GET         /randomuser          controllers.Application.randomUserId()
+GET        /search              controllers.Application.searchGet()
+GET        /randomuser          controllers.Application.randomUserId()
 
-GET         /movie/:id           controllers.Application.getMovie(id: String)
-GET        /loadall            controllers.Application.loadAll()
+GET        /movie/:id           controllers.Application.getMovie(id: String)
+GET        /loadall             controllers.Application.loadAll()
 
 
 
 # Map static resources from the /public folder to the /assets URL path
-GET         /assets/*file        controllers.Assets.at(path="/public", file)
+GET        /assets/*file        controllers.Assets.at(path="/public", file)

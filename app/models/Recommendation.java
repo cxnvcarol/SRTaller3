@@ -27,7 +27,7 @@ public class Recommendation {
         return movie;
     }
 
-    public void setBusiness(Movie business) {
-        this.movie = business;
+    public void setMovie(Movie m) {
+        this.movie = m;
     }
 }
