@@ -13,11 +13,7 @@ import org.apache.mahout.cf.taste.impl.model.MemoryIDMigrator;
 
 public class DataLoader {
 
-
-
-	public static final String rutaUsuarios = "./data/yelp_academic_dataset_user.json";
-	public static final String rutaNegocios = "./data/yelp_academic_dataset_business.json";
-    private static final String MOVIES_PATH = "./data/movies.csv";
+   private static final String MOVIES_PATH = "./data/movies.csv";
     private static final String RATINGS_PATH = "./data/ratings.csv";
 
     private static String[] genres={"Action","Adventure","Animation","Children's","Comedy","Crime","Documentary","Drama","Fantasy","Film-Noir","Horror","Musical","Mystery","Romance","Sci-Fi","Thriller","War","Western"};

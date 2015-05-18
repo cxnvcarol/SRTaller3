@@ -56,7 +56,6 @@ public class Feature extends Model{
 		return name;
 	}
 
-
     public static List<String> getAll()
     {
 
