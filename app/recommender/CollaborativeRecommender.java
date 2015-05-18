@@ -57,7 +57,8 @@ public class CollaborativeRecommender {
     public static final int EUCLIDEAN = 3;
     public static final long user_id_test = 5;
     public static final int MAX_RECOMMENDATIONS = 20;
-    private static final String RATINGS_PATH = "data/ratings.csv";
+    //private static final String RATINGS_PATH = "data/ratings.csv";
+    private static final String RATINGS_PATH = "data/ratings.dat";
     /**
      * Recommender which will be hold by this session bean.
      */
@@ -382,7 +383,7 @@ public class CollaborativeRecommender {
                 System.out.println("Converted UTC TIME (using Format method) : " + dateString);
                 Date desde = new SimpleDateFormat("dd/MM/yyyy").parse(añoDesde);
                 if (date.before(desde)) {
-                    
+
                     dataModel.removePreference(Long.parseLong(usuario), Long.parseLong(tag[1]));
                 }
             }
