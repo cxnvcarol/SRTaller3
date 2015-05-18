@@ -8,11 +8,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.Map.Entry;
 
 import models.EvaluationResult;
@@ -368,6 +367,24 @@ public class CollaborativeRecommender {
             e.printStackTrace();
         }
         return null;
+    }
 
+    public void filtrarTiempoGiovanni(String usuario, String añoDesde) throws IOException, ParseException, NumberFormatException, TasteException {
+        BufferedReader readerNegocios = new BufferedReader(new FileReader(new File("./data/ratings.csv")));
+        String tempStringNegocios = null;
+        while ((tempStringNegocios = readerNegocios.readLine()) != null) {
+            String[] tag = tempStringNegocios.split(",");
+            if (tag[0].equalsIgnoreCase(usuario)) {
+                int time = Integer.parseInt(tag[3]);
+                Date date = new Date(time * 1000L);
+                DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String dateString = formatter.format(date);
+                System.out.println("Converted UTC TIME (using Format method) : " + dateString);
+                Date desde = (Date) new SimpleDateFormat("dd/MM/yyyy").parse(añoDesde);
+                if (date.before(desde)) {
+                    dataModel.removePreference(Long.parseLong(usuario), Long.parseLong(tag[1]));
+                }
+            }
+        }
     }
 }
