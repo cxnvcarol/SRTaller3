@@ -382,6 +382,7 @@ public class CollaborativeRecommender {
                 System.out.println("Converted UTC TIME (using Format method) : " + dateString);
                 Date desde = new SimpleDateFormat("dd/MM/yyyy").parse(añoDesde);
                 if (date.before(desde)) {
+                    
                     dataModel.removePreference(Long.parseLong(usuario), Long.parseLong(tag[1]));
                 }
             }
