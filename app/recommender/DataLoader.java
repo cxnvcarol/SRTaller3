@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import models.*;
 
 public class DataLoader {
+
 	//private static final String MOVIES_PATH = "./data/movies.csv";
     //private static final String RATINGS_PATH = "./data/ratings.csv";
     private static final String MOVIES_PATH = "./data/movies.dat";
