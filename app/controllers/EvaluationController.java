@@ -75,7 +75,8 @@ public class EvaluationController extends Controller {
         {
             printEval(er,System.currentTimeMillis());
         }
-        CollaborativeRecommender.generateDataModel();
+        //TODO
+        CollaborativeRecommender.generateDataModel(1000000000);
         try{
             t0=System.currentTimeMillis();
 	        resCollab = CollaborativeRecommender.evaluate(50, 100, CollaborativeRecommender.EUCLIDEAN, 0.5);

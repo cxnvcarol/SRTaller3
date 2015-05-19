@@ -170,7 +170,7 @@ public class HybridRecommender {
 
         if(user_id==0)
             return new ArrayList<Recommendation>();
-		return colaborativo.executeRecommender(user_id, (int)CollaborativeRecommender.MAX_RECOMMENDATIONS, neighbors, similarityMethod);
+		return colaborativo.executeRecommender(user_id, (int)CollaborativeRecommender.MAX_RECOMMENDATIONS, neighbors, similarityMethod, 1000000000);
 	}
 
 	public static EvaluationResult evaluate (double radioLoc,String hour, double trainingPercentage,int evalMethod)

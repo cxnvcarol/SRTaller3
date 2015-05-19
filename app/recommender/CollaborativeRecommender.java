@@ -8,6 +8,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -59,6 +61,7 @@ public class CollaborativeRecommender {
     public static final int MAX_RECOMMENDATIONS = 20;
     //private static final String RATINGS_PATH = "data/ratings.csv";
     private static final String RATINGS_PATH = "data/ratings.dat";
+    private static final String RATINGS_PATH_OUT = "data/ratings_out.dat";
     /**
      * Recommender which will be hold by this session bean.
      */
@@ -75,19 +78,17 @@ public class CollaborativeRecommender {
      * model can be become quite memory consuming. In our case it will be around
      * 2 mb.
      */
-    private static DataModel dataModel = null;
+    private static  DataModel dataModel = null;
     private static GenericBooleanPrefItemBasedRecommender recommenderGBIR;
     private static CollaborativeRecommender instance;
 
     public static void main(String[] args) {
-        // generateDataModel();
-        EvaluationResult resCollab = CollaborativeRecommender.evaluate(50, 100, CollaborativeRecommender.EUCLIDEAN, 0.5);
-        System.out.println(resCollab.description);
-        System.out.println("Precision: " + resCollab.precision);
-        System.out.println("Recall: " + resCollab.recall);
-        System.out.println("Time: " + resCollab.time);
-
-
+        generateDataModel(968302205);
+//        EvaluationResult resCollab = CollaborativeRecommender.evaluate(50, 100, CollaborativeRecommender.EUCLIDEAN, 0.5);
+//        System.out.println(resCollab.description);
+//        System.out.println("Precision: " + resCollab.precision);
+//        System.out.println("Recall: " + resCollab.recall);
+//        System.out.println("Time: " + resCollab.time);
     }
 
     private static boolean isContainedIn(long business_id,
@@ -101,15 +102,37 @@ public class CollaborativeRecommender {
         return false;
     }
 
-    public static void generateDataModel() {
-
+    public static void generateDataModel(long userTsmp) {
         long beforeData = System.currentTimeMillis();
         //TODO generate and use a view table filtering the timestamp of the user
         //dataModel=new MySQLJDBCDataModel(DB.getDataSource(),"ratings_user_view","","","","");
         //dataModel = new MySQLJDBCDataModel(DB.getDataSource(), "rating", "userid", "movieid", "rating", "timestamp");
+        FileDataModel dataModel2 = null;
         try {
             //dataModel=new FileDataModel(new File(RATINGS_PATH),",");
-            dataModel=new FileDataModel(new File(RATINGS_PATH),"::");
+        	dataModel2=new FileDataModel(new File(RATINGS_PATH),"::");
+        	
+            BufferedReader br = new BufferedReader(new FileReader(new File(RATINGS_PATH)));
+            PrintWriter pw = new PrintWriter(new File(RATINGS_PATH_OUT));
+            String ln;
+            while((ln=br.readLine())!=null){
+            	String[] tags = ln.split("::");
+            	
+            	long userID = Long.parseLong(tags[0]);
+            	long itemID = Long.parseLong(tags[1]);
+            	double rating = Double.parseDouble(tags[2]);
+            	long timeStamp = Long.parseLong(tags[3]);
+            	
+            	Timestamp ts = new Timestamp(timeStamp*1000L);
+            	Timestamp compare = new Timestamp(userTsmp*1000L);
+            	if(ts.after(compare))
+            	{
+            		pw.println(userID+"::"+itemID+"::"+rating+"::"+timeStamp);
+            		//dataModel.removePreference(userID, itemID);
+            	}
+            }
+            pw.close();
+            dataModel=new FileDataModel(new File(RATINGS_PATH_OUT),"::");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -120,15 +143,19 @@ public class CollaborativeRecommender {
             System.out.println("num items: "+nitems);
             System.out.println("num users: "+nusers);
 
+            System.out.println("Original model_____");
+            System.out.println("num items: "+dataModel2.getNumItems());
+            System.out.println("num users: "+dataModel2.getNumUsers());
+
         } catch (TasteException e) {
             e.printStackTrace();
         }
         System.out.println("Model generation was " + (System.currentTimeMillis() - beforeData) + " ms");
     }
 
-    public static ArrayList<Recommendation> executeRecommender(long userID,int numberOfRecommendations, int neighbors, int similarityMethod) {
+    public static ArrayList<Recommendation> executeRecommender(long userID,int numberOfRecommendations, int neighbors, int similarityMethod, long timestamp) {
         try {
-            generateDataModel();
+            generateDataModel(timestamp);
             long recommendTimeStart = System.currentTimeMillis();
             // System.out.println("Recommendation time start: "+recommendTimeStart);
 
