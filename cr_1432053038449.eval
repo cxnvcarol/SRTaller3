@@ -1,0 +1,6 @@
+Recomendador colaborativo: { porcentaje entrenamiento= 50%, usuarios revisados=3492 usuarios relevantes:100, similaridad: Euclidean}
+recall: 0.0
+precision:0.0
+averageTime:4.10095371E8
+totalEvaluationTime:90
+

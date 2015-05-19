@@ -9,4 +9,5 @@ public class EvaluationResult{
     public double recall;
     public double time;
     public String description;
+    public int timestamp;
 }

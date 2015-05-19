@@ -24,6 +24,8 @@ import org.apache.mahout.cf.taste.common.NoSuchUserException;
 import org.apache.mahout.cf.taste.common.TasteException;
 import org.apache.mahout.cf.taste.impl.common.FastByIDMap;
 import org.apache.mahout.cf.taste.impl.common.FastIDSet;
+import org.apache.mahout.cf.taste.impl.common.LongPrimitiveArrayIterator;
+import org.apache.mahout.cf.taste.impl.common.LongPrimitiveIterator;
 import org.apache.mahout.cf.taste.impl.model.GenericDataModel;
 import org.apache.mahout.cf.taste.impl.model.GenericPreference;
 import org.apache.mahout.cf.taste.impl.model.GenericUserPreferenceArray;
@@ -62,13 +64,14 @@ public class CollaborativeRecommender {
      */
     public static final int EUCLIDEAN = 3;
     public static final long user_id_test = 5;
-    public static final int MAX_RECOMMENDATIONS = 20;
+    public static final int MAX_RECOMMENDATIONS = 10;
     //private static final String RATINGS_PATH = "data/ratings.csv";
-    private static final String RATINGS_PATH = "data/ratings.dat";
+    private static final String RATINGS_PATH = "./data/ratings.dat";
     private static final String RATINGS_PATH_OUT = "data/ratings_out.dat";
     /**
      * Recommender which will be hold by this session bean.
      */
+    //private static ItemBasedRecommender recommender = null;
     private static ItemBasedRecommender recommender = null;
     /**
      * An MemoryIDMigrator which is able to create for every string a long
@@ -82,7 +85,7 @@ public class CollaborativeRecommender {
      * model can be become quite memory consuming. In our case it will be around
      * 2 mb.
      */
-    private static  DataModel dataModel = null;
+    public static  DataModel dataModel = null;
     private static GenericBooleanPrefItemBasedRecommender recommenderGBIR;
     private static CollaborativeRecommender instance;
 
@@ -114,7 +117,7 @@ public class CollaborativeRecommender {
         FileDataModel dataModel2 = null;
         try {
             //dataModel=new FileDataModel(new File(RATINGS_PATH),",");
-        	dataModel2=new FileDataModel(new File(RATINGS_PATH),"::");
+        	//dataModel2=new FileDataModel(new File(RATINGS_PATH),"::");
         	
             BufferedReader br = new BufferedReader(new FileReader(new File(RATINGS_PATH)));
             PrintWriter pw = new PrintWriter(new File(RATINGS_PATH_OUT));
@@ -148,9 +151,9 @@ public class CollaborativeRecommender {
             System.out.println("num items: "+nitems);
             System.out.println("num users: "+nusers);
 
-            System.out.println("Original model_____");
-            System.out.println("num items: "+dataModel2.getNumItems());
-            System.out.println("num users: "+dataModel2.getNumUsers());
+//            System.out.println("Original model_____");
+//            System.out.println("num items: "+dataModel2.getNumItems());
+//            System.out.println("num users: "+dataModel2.getNumUsers());
 
         } catch (TasteException e) {
             e.printStackTrace();
@@ -280,8 +283,8 @@ public class CollaborativeRecommender {
         return instance;
     }
 
-    public static EvaluationResult evaluate(int neighbors, int relevantUsers,
-                                            int similarityMethod, double trainingPercentage) {
+    public static EvaluationResult evaluate(int neighbors,
+                                            int similarityMethod, double trainingPercentage, int relevantThreshold) {
         //TODO Check the timestamp implication here
         EvaluationResult er = new EvaluationResult();
         er.precision = 0;
@@ -289,54 +292,49 @@ public class CollaborativeRecommender {
         er.description = "";
         er.time = 0;
         try {
-            String[] uids = EvaluationController
-                    .findPopularUsers(relevantUsers);
-
-//			generateDataModel();
-
-            UserSimilarity similarity;
-            ItemSimilarity itemsimil=new PearsonCorrelationSimilarity(dataModel);
-            if (similarityMethod == PEARSON) {
-                // Pearson
-                similarity = new PearsonCorrelationSimilarity(dataModel);
-                itemsimil=new PearsonCorrelationSimilarity(dataModel);
-            } else if (similarityMethod == SPEARMAN) {
-                similarity = new SpearmanCorrelationSimilarity(dataModel);
-                similarity = new SpearmanCorrelationSimilarity(dataModel);
-            } else {
-                similarity = new EuclideanDistanceSimilarity(dataModel);
-                similarity = new SpearmanCorrelationSimilarity(dataModel);
-            }
-
+        	UserSimilarity similarity;
+        	ItemSimilarity itemsimil=new PearsonCorrelationSimilarity(dataModel);
+        	if (similarityMethod == PEARSON) {
+        		// Pearson
+        		similarity = new PearsonCorrelationSimilarity(dataModel);
+        		itemsimil=new PearsonCorrelationSimilarity(dataModel);
+        	} else if (similarityMethod == SPEARMAN) {
+        		similarity = new SpearmanCorrelationSimilarity(dataModel);
+        	} else {
+        		similarity = new EuclideanDistanceSimilarity(dataModel);
+        	}
 
             recommender = new GenericItemBasedRecommender(dataModel,itemsimil);
-
-            //UserNeighborhood neighborhood = new NearestNUserNeighborhood(neighbors, similarity, dataModel);
-
-            // Instantiate the recommender
-
-            //recommender = new GenericUserBasedRecommender(dataModel,neighborhood, similarity);
 
             double tpTotal = 0;
             double esperadoTotal = 0;
 
             long t1 = 0, averageTime = 0;
-            System.out.println("Tam Arreglo: " + uids.length);
-            for (int i = 0; i < uids.length && i < relevantUsers; i++) {
-                System.out.println(i + "   " + uids[i]);
-                if (uids[i] != null || !uids[i].trim().equals("null")) {
-                    double[] result = recommendEval(thing2long.toLongID(uids[i]),
-                            neighbors);// result[#esperado][#tp
-                    // -
-                    // intersección]
-                    esperadoTotal += result[0];
-                    tpTotal += result[1];
-                }
+            
+            LongPrimitiveIterator userIDs= dataModel.getUserIDs();
+            int contador = 0;
+            
+            while(userIDs.hasNext()){
+            	long userID = userIDs.next();
+            	if(dataModel.getPreferencesFromUser(userID).length()>relevantThreshold){
+            			double result[] = recommendEval(userID, neighbors);// result[#esperado][#tp
+
+                        esperadoTotal += result[0];
+                        tpTotal += result[1];
+            	}
+            	contador++;
             }
-            averageTime = (System.currentTimeMillis() - t1) / uids.length;
-            er.precision = tpTotal
-                    / (MAX_RECOMMENDATIONS * (double) dataModel.getNumUsers());
-            er.recall = tpTotal / (esperadoTotal);
+
+            System.out.println("Esperado Total: "+esperadoTotal);
+            System.out.println("Real Total: "+tpTotal);
+            averageTime = (System.currentTimeMillis() - t1);
+            
+            er.precision = tpTotal / (MAX_RECOMMENDATIONS * (double) dataModel.getNumUsers());
+           // er.precision = (tpTotal - esperadoTotal)/contador;
+            
+            er.recall = tpTotal/esperadoTotal;
+            //er.recall = (tpTotal - esperadoTotal)/MAX_RECOMMENDATIONS * (double) dataModel.getNumUsers();
+            
             String simString = "";
             if (similarityMethod == EUCLIDEAN) {
                 simString = "Euclidean";
@@ -348,9 +346,7 @@ public class CollaborativeRecommender {
             er.description = "Recomendador colaborativo: { porcentaje entrenamiento= "
                     + (int) (trainingPercentage * 100)
                     + "%, usuarios revisados="
-                    + uids.length
-                    + " usuarios relevantes:"
-                    + relevantUsers
+                    + contador
                     + ", similaridad: " + simString + "}";
             er.time = averageTime;
 

@@ -1,0 +1,6 @@
+Recomendador colaborativo: { porcentaje entrenamiento= 50%, usuarios revisados=594, similaridad: Pearson}
+recall: 1.0
+precision:1.0498316498316498
+averageTime:1.432054749743E12
+totalEvaluationTime:1
+

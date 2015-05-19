@@ -26,8 +26,9 @@ public class MovieLoader {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// crearScriptFeature();
-		crearScriptMovie();
+		 //crearScriptFeature();
+		 crearRatingsScript();
+		//crearScriptMovie();
 		// crearScriptFeatureMovie();
 		// crearScriptUser();
 		// try {
@@ -46,6 +47,32 @@ public class MovieLoader {
 		// // TODO Auto-generated catch block
 		// e.printStackTrace();
 		// }
+	}
+
+	private static void crearRatingsScript() {
+		try {
+			PrintWriter pwFeatureMovieOutput = new PrintWriter(new File("./data/ratings.sql"), "UTF-8");
+
+			BufferedReader br = new BufferedReader(new FileReader(
+					"./data/ratings.dat"));
+			String ln;
+			while ((ln = br.readLine()) != null) {
+				String[] info = ln.split("::");
+				try {
+					
+					String sqlQuery = "insert into rating (userid, movieid, rating, timestamp) values (\""
+							+ info[0] + "\",\"" + info[1] + "\",\"" + info[2] + "\",\"" + info[3] + "\");";
+					pwFeatureMovieOutput.println(sqlQuery);
+				} catch (ArrayIndexOutOfBoundsException a) {
+					System.out.println("Out of Bounds!");
+				}
+
+			}
+			pwFeatureMovieOutput.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public static void crearScriptMovie() {
@@ -147,6 +174,7 @@ public class MovieLoader {
 			while ((ln = br.readLine()) != null) {
 				String[] info = ln.split(";");
 				try {
+					
 					String sqlQuery = "insert into movie_feature (movie_id, feature_id) values (\""
 							+ info[0] + "\",\"" + info[1] + "\");";
 					pwFeatureMovieOutput.println(sqlQuery);
@@ -173,12 +201,8 @@ public class MovieLoader {
 			while ((ln = br.readLine()) != null) {
 				String[] movieInfo = ln.split(";");
 				try {
-					String sqlQuery = "insert into feature (id, name, type) values (\""
-							+ movieInfo[0]
-							+ "\",\""
-							+ movieInfo[1]
-							+ "\",\""
-							+ movieInfo[2] + "\");";
+					String sqlQuery = "update feature set type=\""
+							+ movieInfo[2] + "\" where id=\""+movieInfo[0]+"\";";
 					pwFeatureOutput.println(sqlQuery);
 				} catch (ArrayIndexOutOfBoundsException a) {
 					System.out.println("Out of Bounds!");

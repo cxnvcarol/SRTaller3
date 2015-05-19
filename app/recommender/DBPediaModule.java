@@ -88,6 +88,8 @@ public class DBPediaModule {
 
 					Model model = ModelFactory.createDefaultModel();
 					URL rdfData = new URL(uriM);
+					
+					
 					BufferedReader in = new BufferedReader(
 							new InputStreamReader(rdfData.openStream()));
 
@@ -175,7 +177,7 @@ public class DBPediaModule {
 							// feat.id = Feature.find.nextId();
 							// feat.save();
 
-							pwFeatures.println(repartost.hashCode() + ";"+ repartost + ";" + "director");
+							pwFeatures.println(repartost.hashCode() + ";"+ repartost + ";" + "starring");
 							pwFeaturesMovies.println(idMov + ";"+ repartost.hashCode());
 
 							// featuresMovie.add(feat);
@@ -202,8 +204,8 @@ public class DBPediaModule {
 					pwReparto.println();
 					pwTemas.println();
 
-				} catch (FileNotFoundException e) {
-
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			}
 			macroModel.write(pwRDF);

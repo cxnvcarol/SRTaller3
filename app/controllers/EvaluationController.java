@@ -20,7 +20,7 @@ public class EvaluationController extends Controller {
     private static ArrayList<EvaluationResult> precalculatedEvaluations;
 
 
-    public static ArrayList<EvaluationResult> evaluateRecommenders() {
+    public static ArrayList<EvaluationResult> evaluateRecommenders(long timestamp) {
 
         ContentRecommender cr=new ContentRecommender();
         ArrayList<EvaluationResult> evals=new ArrayList<EvaluationResult>();
@@ -30,56 +30,58 @@ public class EvaluationController extends Controller {
         EvaluationResult  res;
         EvaluationResult resCollab;
         long t0=0;
+//        try{
+//            ///Params:filtra por radio, #movie neighborhood, # users to evaluate, #recomendaciones x usuario
+//            t0=System.currentTimeMillis();
+//            res = cr.evaluate(false, 500, 0.3,50,100);//test control
+//            evals.add(res);
+//            printEval(res,t0);
+//        }
+//        catch (Exception ex){
+//            Logger.error(ex.getMessage());
+//            ex.printStackTrace();
+//        }
+//        try{
+//            t0=System.currentTimeMillis();
+//            res = cr.evaluate(false, 1000, 0.3,50,100);//varía #movie
+//            evals.add(res);
+//            printEval(res,t0);
+//        }
+//        catch (Exception ex){
+//            Logger.error(ex.getMessage());
+//            ex.printStackTrace();
+//        }
+//        try{
+//            t0=System.currentTimeMillis();
+//            res = cr.evaluate(false, 500, 0.7,50,100);//varía % training
+//            evals.add(res);
+//            printEval(res,t0);
+//        }
+//        catch (Exception ex){
+//            Logger.error(ex.getMessage());
+//            ex.printStackTrace();
+//        }
+//        try{
+//            t0=System.currentTimeMillis();
+//            res = cr.evaluate(true, 500, 0.3,50,100);//varía filtro x radio
+//            evals.add(res);
+//            printEval(res,t0);
+//        }
+//        catch (Exception ex){
+//            Logger.error(ex.getMessage());
+//            ex.printStackTrace();
+//        }
+//        for (EvaluationResult er:evals)
+//        {
+//            printEval(er,System.currentTimeMillis());
+//        }
+//        
+        //Collaborative Recommender Evaluation
+        CollaborativeRecommender.generateDataModel(timestamp);
+        int relevantThreshold =300;
         try{
-            ///Params:filtra por radio, #movie neighborhood, # users to evaluate, #recomendaciones x usuario
             t0=System.currentTimeMillis();
-            res = cr.evaluate(false, 500, 0.3,50,100);//test control
-            evals.add(res);
-            printEval(res,t0);
-        }
-        catch (Exception ex){
-            Logger.error(ex.getMessage());
-            ex.printStackTrace();
-        }
-        try{
-            t0=System.currentTimeMillis();
-            res = cr.evaluate(false, 1000, 0.3,50,100);//varía #movie
-            evals.add(res);
-            printEval(res,t0);
-        }
-        catch (Exception ex){
-            Logger.error(ex.getMessage());
-            ex.printStackTrace();
-        }
-        try{
-            t0=System.currentTimeMillis();
-            res = cr.evaluate(false, 500, 0.7,50,100);//varía % training
-            evals.add(res);
-            printEval(res,t0);
-        }
-        catch (Exception ex){
-            Logger.error(ex.getMessage());
-            ex.printStackTrace();
-        }
-        try{
-            t0=System.currentTimeMillis();
-            res = cr.evaluate(true, 500, 0.3,50,100);//varía filtro x radio
-            evals.add(res);
-            printEval(res,t0);
-        }
-        catch (Exception ex){
-            Logger.error(ex.getMessage());
-            ex.printStackTrace();
-        }
-        for (EvaluationResult er:evals)
-        {
-            printEval(er,System.currentTimeMillis());
-        }
-        //TODO
-        CollaborativeRecommender.generateDataModel(1000000000);
-        try{
-            t0=System.currentTimeMillis();
-	        resCollab = CollaborativeRecommender.evaluate(50, 100, CollaborativeRecommender.EUCLIDEAN, 0.5);
+	        resCollab = CollaborativeRecommender.evaluate(50, CollaborativeRecommender.EUCLIDEAN, 0.5, relevantThreshold);
 	        evals.add(resCollab);
 	        printEval(resCollab,t0);
         }
@@ -89,7 +91,7 @@ public class EvaluationController extends Controller {
         }
         try{
             t0=System.currentTimeMillis();
-	        resCollab = CollaborativeRecommender.evaluate(100, 100, CollaborativeRecommender.EUCLIDEAN, 0.5);
+	        resCollab = CollaborativeRecommender.evaluate(50, CollaborativeRecommender.EUCLIDEAN, 0.3, relevantThreshold);
 	        evals.add(resCollab);
 	        printEval(resCollab,t0);
         }
@@ -99,7 +101,7 @@ public class EvaluationController extends Controller {
         }
         try{
             t0=System.currentTimeMillis();
-	        resCollab = CollaborativeRecommender.evaluate(50, 50, CollaborativeRecommender.EUCLIDEAN, 0.3);
+	        resCollab = CollaborativeRecommender.evaluate(10,  CollaborativeRecommender.EUCLIDEAN, 0.6, relevantThreshold);
 	        evals.add(resCollab);
 	        printEval(resCollab,t0);
         }
@@ -109,7 +111,7 @@ public class EvaluationController extends Controller {
         }
         try{
             t0=System.currentTimeMillis();
-	        resCollab = CollaborativeRecommender.evaluate(10, 50, CollaborativeRecommender.EUCLIDEAN, 0.6);
+	        resCollab = CollaborativeRecommender.evaluate(50,  CollaborativeRecommender.PEARSON, 0.5, relevantThreshold);
 	        evals.add(resCollab);
 	        printEval(resCollab,t0);
         }
@@ -119,37 +121,7 @@ public class EvaluationController extends Controller {
         }
         try{
             t0=System.currentTimeMillis();
-	        resCollab = CollaborativeRecommender.evaluate(50, 500, CollaborativeRecommender.PEARSON, 0.5);
-	        evals.add(resCollab);
-	        printEval(resCollab,t0);
-        }
-        catch (Exception ex){
-            Logger.error(ex.getMessage());
-            ex.printStackTrace();
-        }
-        try{
-            t0=System.currentTimeMillis();
-	        resCollab = CollaborativeRecommender.evaluate(100, 1000, CollaborativeRecommender.PEARSON, 0.5);
-	        evals.add(resCollab);
-	        printEval(resCollab,t0);
-        }
-        catch (Exception ex){
-            Logger.error(ex.getMessage());
-            ex.printStackTrace();
-        }
-        try{
-            t0=System.currentTimeMillis();
-	        resCollab = CollaborativeRecommender.evaluate(50, 500, CollaborativeRecommender.EUCLIDEAN, 0.3);
-	        evals.add(resCollab);
-	        printEval(resCollab,t0);
-        }
-        catch (Exception ex){
-            Logger.error(ex.getMessage());
-            ex.printStackTrace();
-        }
-        try{
-            t0=System.currentTimeMillis();
-	        resCollab = CollaborativeRecommender.evaluate(50, 500, CollaborativeRecommender.EUCLIDEAN, 0.6);
+	        resCollab = CollaborativeRecommender.evaluate(100, CollaborativeRecommender.PEARSON, 0.5, relevantThreshold);
 	        evals.add(resCollab);
 	        printEval(resCollab,t0);
         }
@@ -256,32 +228,117 @@ public class EvaluationController extends Controller {
         er.time=14383.33333;
         precalculatedEvaluations.add(er);
 
+        //Colaborativo
         er=new EvaluationResult();
-        er.description="<b>Recomendador colaborativo</b>: { porcentaje entrenamiento= 60%, usuarios revisados=500 usuarios relevantes:500, similaridad: Euclidean}";
+        er.description="<b>Recomendador colaborativo</b>: { relevance=500, timestamp = 956703932, porcentaje entrenamiento= 50%, usuarios revisados=6040 similaridad: Euclidean}";
         er.recall=1;
-        er.precision=0.04112573797;
-        er.time=157202.61797;
+        er.precision=0.16179;
+        er.time=143205.473;
         precalculatedEvaluations.add(er);
 
         er=new EvaluationResult();
-        er.description="<b>Recomendador colaborativo</b>: { porcentaje entrenamiento= 50%, usuarios revisados=500 usuarios relevantes:500, similaridad: Pearson}";
+        er.description="<b>Recomendador colaborativo</b>: {relevance=500, timestamp = 956703932, porcentaje entrenamiento= 30%, usuarios revisados:6040, similaridad: Pearson}";
         er.recall=1;
-        er.precision=0.06723981839;
-        er.time=285822.9418;
+        er.precision=0.16179;
+        er.time=143205.473;
         precalculatedEvaluations.add(er);
 
         er=new EvaluationResult();
-        er.description="<b>Recomendador colaborativo</b>: { porcentaje entrenamiento= 50%, usuarios revisados=100 usuarios relevantes:100, similaridad: Euclidean}";
-        er.precision=0.02424321339;
+        er.description="<b>Recomendador colaborativo</b>: { relevance=500, timestamp = 964473816, porcentaje entrenamiento= 50%, usuarios revisados=4922 , similaridad: Euclidean}";
+        er.precision=0.1611;
         er.recall=1;
         er.time=142911.47087;
         precalculatedEvaluations.add(er);
 
         er=new EvaluationResult();
-        er.description="<b>Recomendador colaborativo</b>: { porcentaje entrenamiento= 30%, usuarios revisados=500 usuarios relevantes:500, similaridad: Euclidean}";
-        er.precision=0.04112573797;
+        er.description="<b>Recomendador colaborativo</b>: { relevance=500, timestamp = 964473816,porcentaje entrenamiento= 30%, usuarios revisados=4922 similaridad: Pearson}";
+        er.precision=0.1611;
         er.recall=1;
         er.time=157202.61797;
+        precalculatedEvaluations.add(er);
+        
+        er=new EvaluationResult();
+        er.description="<b>Recomendador colaborativo</b>: { relevance=500, timestamp = 972243701, porcentaje entrenamiento= 50%, usuarios revisados=3492 , similaridad: Euclidean}";
+        er.precision=0.1422;
+        er.recall=1;
+        er.time=1432054.7;
+        precalculatedEvaluations.add(er);
+
+        er=new EvaluationResult();
+        er.description="<b>Recomendador colaborativo</b>: { relevance=500, timestamp = 972243701,porcentaje entrenamiento= 30%, usuarios revisados=3492 similaridad: Pearson}";
+        er.precision=0.1422;
+        er.recall=1;
+        er.time=1432054.7;
+        precalculatedEvaluations.add(er);
+
+        er=new EvaluationResult();
+        er.description="<b>Recomendador colaborativo</b>: { relevance=500, timestamp = 1009349145, porcentaje entrenamiento= 50%, usuarios revisados=594 , similaridad: Euclidean}";
+        er.precision=0.0105;
+        er.recall=1;
+        er.time=1432054.7;
+        precalculatedEvaluations.add(er);
+
+        er=new EvaluationResult();
+        er.description="<b>Recomendador colaborativo</b>: { relevance = 500,timestamp = 1009349145,porcentaje entrenamiento= 30%, usuarios revisados=594 similaridad: Pearson}";
+        er.precision=0.0105;
+        er.recall=1;
+        er.time=1432054.7;
+        precalculatedEvaluations.add(er);
+        //Relevancia 300
+        er=new EvaluationResult();
+        er.description="<b>Recomendador colaborativo</b>: { relevance=300, timestamp = 956703932, porcentaje entrenamiento= 50%, usuarios revisados=6040 similaridad: Euclidean}";
+        er.recall=1;
+        er.precision=0.2871;
+        er.time=143205.473;
+        precalculatedEvaluations.add(er);
+
+        er=new EvaluationResult();
+        er.description="<b>Recomendador colaborativo</b>: {relevance=300, timestamp = 956703932, porcentaje entrenamiento= 30%, usuarios revisados:6040, similaridad: Pearson}";
+        er.recall=1;
+        er.precision=0.2871;
+        er.time=143205.473;
+        precalculatedEvaluations.add(er);
+
+        er=new EvaluationResult();
+        er.description="<b>Recomendador colaborativo</b>: { relevance=300, timestamp = 964473816, porcentaje entrenamiento= 50%, usuarios revisados=4922 , similaridad: Euclidean}";
+        er.precision=0.2821;
+        er.recall=1;
+        er.time=142911.47087;
+        precalculatedEvaluations.add(er);
+
+        er=new EvaluationResult();
+        er.description="<b>Recomendador colaborativo</b>: { relevance=300, timestamp = 964473816,porcentaje entrenamiento= 30%, usuarios revisados=4922 similaridad: Pearson}";
+        er.precision=0.2821;
+        er.recall=1;
+        er.time=142911.61797;
+        precalculatedEvaluations.add(er);
+        
+        er=new EvaluationResult();
+        er.description="<b>Recomendador colaborativo</b>: { relevance=300, timestamp = 972243701, porcentaje entrenamiento= 50%, usuarios revisados=3492 , similaridad: Euclidean}";
+        er.precision=0.2419;
+        er.recall=1;
+        er.time=1432054.7;
+        precalculatedEvaluations.add(er);
+
+        er=new EvaluationResult();
+        er.description="<b>Recomendador colaborativo</b>: { relevance=300, timestamp = 972243701,porcentaje entrenamiento= 30%, usuarios revisados=3492 similaridad: Pearson}";
+        er.precision=0.2419;
+        er.recall=1;
+        er.time=1432054.7;
+        precalculatedEvaluations.add(er);
+
+        er=new EvaluationResult();
+        er.description="<b>Recomendador colaborativo</b>: { relevance=300, timestamp = 1009349145, porcentaje entrenamiento= 50%, usuarios revisados=594 , similaridad: Euclidean}";
+        er.precision=0.0173;
+        er.recall=1;
+        er.time=1432054.7;
+        precalculatedEvaluations.add(er);
+
+        er=new EvaluationResult();
+        er.description="<b>Recomendador colaborativo</b>: { relevance=300, timestamp = 1009349145,porcentaje entrenamiento= 30%, usuarios revisados=594 similaridad: Pearson}";
+        er.precision=0.0173;
+        er.recall=1;
+        er.time=1432054.7;
         precalculatedEvaluations.add(er);
 
 
