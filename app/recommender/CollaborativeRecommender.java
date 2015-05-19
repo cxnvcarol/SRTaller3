@@ -19,6 +19,8 @@ import java.util.Map.Entry;
 import models.EvaluationResult;
 import models.Movie;
 import models.Recommendation;
+
+import org.apache.mahout.cf.taste.common.NoSuchUserException;
 import org.apache.mahout.cf.taste.common.TasteException;
 import org.apache.mahout.cf.taste.impl.common.FastByIDMap;
 import org.apache.mahout.cf.taste.impl.common.FastIDSet;
@@ -44,6 +46,8 @@ import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 import org.apache.mahout.cf.taste.recommender.UserBasedRecommender;
 import org.apache.mahout.cf.taste.similarity.ItemSimilarity;
 import org.apache.mahout.cf.taste.similarity.UserSimilarity;
+
+import com.avaje.ebean.Ebean;
 
 import controllers.EvaluationController;
 import play.Logger;
@@ -83,7 +87,7 @@ public class CollaborativeRecommender {
     private static CollaborativeRecommender instance;
 
     public static void main(String[] args) {
-        generateDataModel(968302205);
+       // generateDataModel(968302205, 0);
 //        EvaluationResult resCollab = CollaborativeRecommender.evaluate(50, 100, CollaborativeRecommender.EUCLIDEAN, 0.5);
 //        System.out.println(resCollab.description);
 //        System.out.println("Precision: " + resCollab.precision);
@@ -119,6 +123,7 @@ public class CollaborativeRecommender {
             	String[] tags = ln.split("::");
             	
             	long userID = Long.parseLong(tags[0]);
+            	            	
             	long itemID = Long.parseLong(tags[1]);
             	double rating = Double.parseDouble(tags[2]);
             	long timeStamp = Long.parseLong(tags[3]);
@@ -210,7 +215,8 @@ public class CollaborativeRecommender {
                     Recommendation recom = new Recommendation(found,
                             rec.getValue());
                     result.add(recom);
-                }
+                }else
+                	System.out.println("Movie not found: "+rec.getItemID());
             }
             System.out.println("All collaborative recommendations added");
             long timeElapsed = System.currentTimeMillis() - recommendTimeStart;
@@ -244,8 +250,9 @@ public class CollaborativeRecommender {
             // for (RecommendedItem item : items) {
             // recommendations.add(thing2long.toStringID(item.getItemID()));
             // }
-        } catch (TasteException e) {
-            throw e;
+        }
+        catch(TasteException e){
+        	
         }
         System.out.println("\n ATTENTION!! getting collaborative recommendations "+ (System.currentTimeMillis() - t1) + "ms\n\n");
         return items;

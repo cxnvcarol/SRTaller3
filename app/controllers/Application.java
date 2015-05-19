@@ -56,6 +56,7 @@ public class Application extends Controller {
 
     public static Result searchGet()
     {
+    	MovieLoader.crearScriptMovie();
         String msg="";
         DynamicForm data = Form.form().bindFromRequest();
         String user_id="";
@@ -98,7 +99,8 @@ public class Application extends Controller {
 			} catch (ParseException e) {
 	            msg+="\nCould not parse date";
 			}
-        	timestamp = date.getTime();
+			if(date!=null)
+				timestamp = date.getTime();
         	
         }
         else
