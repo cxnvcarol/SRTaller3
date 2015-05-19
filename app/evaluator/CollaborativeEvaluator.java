@@ -30,15 +30,18 @@ import org.apache.mahout.cf.taste.model.Preference;
 import org.apache.mahout.cf.taste.model.PreferenceArray;
 import org.apache.mahout.classifier.ConfusionMatrix;
 
+import controllers.EvaluationController;
+
+import recommender.CollaborativeRecommender;
+
 public class CollaborativeEvaluator {
 
 	protected static final int neighbourhoodSize = 100;
-	private static final String translatedData = "./data/reviews_info_translated.csv";
 	public static RecommenderEvaluator evaluador1;
 	public static RecommenderEvaluator evaluador2 = new AverageAbsoluteDifferenceRecommenderEvaluator();
-	private static String rutaReviewInfo = "./data/reviews_info.txt";
+	private static String rutaRatings = "./data/ratings.dat";
 
-	private static FileDataModel dataModel;
+	private static DataModel dataModel;
 	public static ConfusionMatrix cm;
 	/**
 	 * An MemoryIDMigrator which is able to create for every string a long
@@ -48,82 +51,86 @@ public class CollaborativeEvaluator {
 	private static MemoryIDMigrator thing2long = new MemoryIDMigrator();
 
 	public static void main(String[] args) {
-		evaluador1 = new RMSRecommenderEvaluator();
-		createDataModel();
-		evaluateUserBased(dataModel);
+		int minTimestamp = 956703932;
+		int lowTimestamp = 964473816;
+		int avgtimestamp = 972243701;
+		int highTimestamp = 1009349145;
+		
+		System.out.println("Min Timestamp:" + minTimestamp);
+		EvaluationController.evaluateRecommenders(minTimestamp);
+		System.out.println("Low Timestamp:" + lowTimestamp);
+		EvaluationController.evaluateRecommenders(lowTimestamp);
+		System.out.println("Avg Timestamp:" + avgtimestamp);
+		EvaluationController.evaluateRecommenders(avgtimestamp);
+		System.out.println("High Timestamp: " + highTimestamp);
+		EvaluationController.evaluateRecommenders(highTimestamp);
 	}
 
-	private static void createDataModel() {
-		try {
-			// create a file out of the resource
-			File data = new File(rutaReviewInfo);
-
-			// create a map for saving the preferences (likes) for
-			// a certain person
-			Map<Long, List<Preference>> preferecesOfUsers = new HashMap<Long, List<Preference>>();
-
-			// Read File
-			BufferedReader br = new BufferedReader(new FileReader(data));
-			PrintWriter pw = new PrintWriter(new File(translatedData));
-
-			String line;
-
-			// go through every line
-			while ((line = br.readLine()) != null) {
-				String[] parts = line.split(";");
-				String person = parts[0].trim();
-				String likeName = parts[1].trim();
-				float preference = Float.parseFloat(parts[2].trim());
-
-				// create a long from the person name
-				long userLong = thing2long.toLongID(person);
-
-				// store the mapping for the user
-				thing2long.storeMapping(userLong, person);
-
-				// create a long from the like name
-				long itemLong = thing2long.toLongID(likeName);
-
-				// store the mapping for the item
-				thing2long.storeMapping(itemLong, likeName);
-				pw.println(userLong+","+itemLong+","+preference);
-
-//				List<Preference> userPrefList;
+	private static void createDataModel() 
+	{
+		dataModel = CollaborativeRecommender.dataModel;
+//			dataModel.get
+//			// create a file out of the resource
+//			File data = new File(rutaRatings);
 //
-//				// if we already have a userPrefList use it
-//				// otherwise create a new one.
-//				if ((userPrefList = preferecesOfUsers.get(userLong)) == null) {
-//					userPrefList = new ArrayList<Preference>();
-//					preferecesOfUsers.put(userLong, userPrefList);
-//				}
-//				// add the like that we just found to this user
-//				userPrefList.add(new GenericPreference(userLong, itemLong,preference));
+//			// create a map for saving the preferences (likes) for
+//			// a certain person
+//			Map<Long, List<Preference>> preferecesOfUsers = new HashMap<Long, List<Preference>>();
 //
-//				// System.out.println("Adding " + person + "(" + userLong
-//				// + ") to " + likeName + "(" + itemLong
-//				// + ") with preference " + preference);
-			}
-
-			// create the corresponding mahout data structure from the map
-//			FastByIDMap<PreferenceArray> preferecesOfUsersFastMap = new FastByIDMap<PreferenceArray>();
-//			for (Entry<Long, List<Preference>> entry : preferecesOfUsers.entrySet()) {
-//				preferecesOfUsersFastMap.put(entry.getKey(),new GenericUserPreferenceArray(entry.getValue()));
+//			// Read File
+//			BufferedReader br = new BufferedReader(new FileReader(data));
+//			PrintWriter pw = new PrintWriter(new File(translatedData));
+//
+//			String line;
+//
+//			// go through every line
+//			while ((line = br.readLine()) != null) {
+//				String[] parts = line.split(";");
+//				String person = parts[0].trim();
+//				String likeName = parts[1].trim();
+//				float preference = Float.parseFloat(parts[2].trim());
+//
+//				// create a long from the person name
+//				long userLong = thing2long.toLongID(person);
+//
+//				// store the mapping for the user
+//				thing2long.storeMapping(userLong, person);
+//
+//				// create a long from the like name
+//				long itemLong = thing2long.toLongID(likeName);
+//
+//				// store the mapping for the item
+//				thing2long.storeMapping(itemLong, likeName);
+//				pw.println(userLong+","+itemLong+","+preference);
+//
+////				List<Preference> userPrefList;
+////
+////				// if we already have a userPrefList use it
+////				// otherwise create a new one.
+////				if ((userPrefList = preferecesOfUsers.get(userLong)) == null) {
+////					userPrefList = new ArrayList<Preference>();
+////					preferecesOfUsers.put(userLong, userPrefList);
+////				}
+////				// add the like that we just found to this user
+////				userPrefList.add(new GenericPreference(userLong, itemLong,preference));
+////
+////				// System.out.println("Adding " + person + "(" + userLong
+////				// + ") to " + likeName + "(" + itemLong
+////				// + ") with preference " + preference);
 //			}
-			pw.close();
-			// create a data model
-//			FileDataModel.determineDelimiter(";");
-			dataModel = new FileDataModel(new File(translatedData));
-			System.out.println("DataModel Created");
-			System.out.println("Numero de Usuarios: " + dataModel.getNumUsers()
-					+ "Numero de Items: " + dataModel.getNumItems());
-		} catch (IOException e) {
-			System.out.println("Exception: " + e.getClass() + ": "
-					+ e.getMessage());
-			e.printStackTrace();
-		} catch (TasteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//
+//			// create the corresponding mahout data structure from the map
+////			FastByIDMap<PreferenceArray> preferecesOfUsersFastMap = new FastByIDMap<PreferenceArray>();
+////			for (Entry<Long, List<Preference>> entry : preferecesOfUsers.entrySet()) {
+////				preferecesOfUsersFastMap.put(entry.getKey(),new GenericUserPreferenceArray(entry.getValue()));
+////			}
+//			pw.close();
+//			// create a data model
+////			FileDataModel.determineDelimiter(";");
+//			dataModel = new FileDataModel(new File(ratings));
+//			System.out.println("DataModel Created");
+//			System.out.println("Numero de Usuarios: " + dataModel.getNumUsers()
+//					+ "Numero de Items: " + dataModel.getNumItems());
 	}
 
 	public static void evaluateUserBased(DataModel dataModel) {

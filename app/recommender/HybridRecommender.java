@@ -52,59 +52,58 @@ public class HybridRecommender {
     	ArrayList<Recommendation> finalRecs = new ArrayList<Recommendation>();
     	int ultimaPos=collabRecs.size()+contentRecs.size();
     	
-//    	//Los llena de nulos para 'reservar' el espacio y poder acceder a las posiciones especificas
-//    	for( int i = 0 ; i<ultimaPos ; i++)
-//    	{
-//    		finalRecs.add(null);
-//    	}
-//    	
-//    	int posIntro;
-//    	for( int i = 0 ; i < collabRecs.size(); i ++)
-//    	{
-//    		Recommendation collab = collabRecs.get(i);
-//    		
-//    		boolean termino = false;
-//    		for( int j = 0 ; j<contentRecs.size() && !termino ; j ++){
-//    			Recommendation content = contentRecs.get(j);
-//    			
-//    			if(content.getMovie()!=null){
-//	    			if(collab.getMovie().id==content.getMovie().id){
-//	    				//Promedio de posicion entre las dos listas
-//	    				posIntro = (i+j)/2;
-//	    				contentRecs.set(j, null);
-//	    				boolean intro = introducirAntes(collab, posIntro, finalRecs);
-//	    				if(!intro){
-//	    					introducirDespues(collab, posIntro, finalRecs);
-//	    				}
-//	    				termino = true;
-//	    			}
-//    			}
-//    		}
-//    		if(!termino)
-//    			finalRecs.add(collab);
-//    	}
-//    	for(int i= 0 ; i< contentRecs.size(); i++){
-//    		if(contentRecs.get(i)==null){
-//    			contentRecs.remove(i);
-//    			System.out.println("NULL CONTENT RECOMMENDATION REMOVED");
-//    		}
-//    	}
-//    	for(int i= 0 ; i< contentRecs.size(); i++){
-//    		finalRecs.add(contentRecs.get(i));
-//    	}
-//    	for(int i=finalRecs.size()-1 ; i>=0; i--){
-//    		if(finalRecs.get(i)==null){
-//    			finalRecs.remove(i);
-//    			System.out.println("NULL RECOMMENDATION REMOVED");
-//    		}
-//    	}
-//    	
-//    	for(int i = 0; i< finalRecs.size() ; i++){
-//    		System.out.println(finalRecs.get(i).movie.title);
-//    	}
-//    	return finalRecs;
-        //return collabRecs;
-        return contentRecs;
+    	//Los llena de nulos para 'reservar' el espacio y poder acceder a las posiciones especificas
+    	for( int i = 0 ; i<ultimaPos ; i++)
+    	{
+    		finalRecs.add(null);
+    	}
+    	
+    	int posIntro;
+    	for( int i = 0 ; i < collabRecs.size(); i ++)
+    	{
+    		Recommendation collab = collabRecs.get(i);
+    		
+    		boolean termino = false;
+    		for( int j = 0 ; j<contentRecs.size() && !termino ; j ++){
+    			Recommendation content = contentRecs.get(j);
+    			
+    			if(content.getMovie()!=null){
+	    			if(collab.getMovie().id==content.getMovie().id){
+	    				//Promedio de posicion entre las dos listas
+	    				posIntro = (i+j)/2;
+	    				contentRecs.set(j, null);
+	    				boolean intro = introducirAntes(collab, posIntro, finalRecs);
+	    				if(!intro){
+	    					introducirDespues(collab, posIntro, finalRecs);
+	    				}
+	    				termino = true;
+	    			}
+    			}
+    		}
+    		if(!termino)
+    			finalRecs.add(collab);
+    	}
+    	for(int i= 0 ; i< contentRecs.size(); i++){
+    		if(contentRecs.get(i)==null){
+    			contentRecs.remove(i);
+    			System.out.println("NULL CONTENT RECOMMENDATION REMOVED");
+    		}
+    	}
+    	for(int i= 0 ; i< contentRecs.size(); i++){
+    		finalRecs.add(contentRecs.get(i));
+    	}
+    	for(int i=finalRecs.size()-1 ; i>=0; i--){
+    		if(finalRecs.get(i)==null){
+    			finalRecs.remove(i);
+    			System.out.println("NULL RECOMMENDATION REMOVED");
+    		}
+    	}
+    	
+    	for(int i = 0; i< finalRecs.size() ; i++){
+    		System.out.println(finalRecs.get(i).movie.title);
+    	}
+    	return finalRecs;
+//        return collabRecs;
     }
 
     private static ArrayList<Recommendation> popularMovies(int maxRecommendations) {
@@ -158,7 +157,7 @@ public class HybridRecommender {
 
 	private static ArrayList<Recommendation> getContentRecommendations(User user, long timestamp) {
 		ArrayList<Recommendation> returned = new ArrayList<Recommendation>();
-//
+//    	
 
         contenido.setMaxRecommendations(4000);
 
