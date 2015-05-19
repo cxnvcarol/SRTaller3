@@ -62,11 +62,13 @@ public class User extends Model{
 
         for(Rating r:myratings)
         {
-            Movie m=Movie.find.byId(r.movieid);
+            Movie m=Ebean.find(Movie.class).fetch("features").setId(r.movieid).findUnique();
 
             if(m!=null)
             {
-                for(Feature f:m.features)
+
+                List<Feature> movFeatures = m.features;
+                for(Feature f:movFeatures)
                 {
                     setOrUpdateFeature(f, r.rating);
                 }

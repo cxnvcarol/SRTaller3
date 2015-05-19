@@ -27,7 +27,7 @@ public class MovieLoader {
 	 */
 	public static void main(String[] args) {
 		// crearScriptFeature();
-		crearScriptMovie();
+		//crearScriptMovie();
 		// crearScriptFeatureMovie();
 		// crearScriptUser();
 		// try {
@@ -46,66 +46,6 @@ public class MovieLoader {
 		// // TODO Auto-generated catch block
 		// e.printStackTrace();
 		// }
-	}
-
-	public static void crearScriptMovie() {
-		// id, imdb, dbpedia, title, numrating, avr_rating
-		try {
-			//PrintWriter pw = new PrintWriter(new File("./data/movies.sql"));
-			BufferedReader br = new BufferedReader(new FileReader("./data/movies.dat"));
-			String ln;
-			ArrayList<Movie> movies = new ArrayList<Movie>();
-			while ((ln = br.readLine()) != null) {
-				String[] linea = ln.split("::");
-				Movie movie= new Movie();
-				movie.id=Long.parseLong(linea[0]);
-				movie.title = linea[1];
-
-				movie.update();
-				movies.add(movie);
-				//pw.println("insert into movie values (\"" + linea[0] +"\",\""+linea[1]+ "\");");
-			}
-			br.close();
-			br = new BufferedReader(new FileReader("./data/MappingDBpedia2Movielens.tsv"));
-			String line;
-			while((line = br.readLine()) != null){
-				String[] partes = line.split("	"); // id,nombre,uri
-				long movie_id = Long.parseLong(partes[0]);
-				
-				Movie searched = Movie.find.byId(movie_id);
-				
-				String dbpediaURI = partes[2];
-
-				dbpediaURI = dbpediaURI.replace("resource", "data");
-				dbpediaURI += ".rdf";
-				
-				searched.dbpedia_uri = dbpediaURI;
-				searched.save();
-
-			}
-			br = new BufferedReader(new FileReader("./data/ratings.dat"));
-			String linea;
-			while((linea = br.readLine()) != null){
-				String[] partes = linea.split("::"); // id,item, rating
-				
-				long movie_id = Long.parseLong(partes[1]);
-				Movie searched = Movie.find.byId(movie_id);
-				
-				double rating = Double.parseDouble(partes[2]);
-				searched.addRating(rating);
-				
-				searched.save();
-
-			}
-			
-		} catch (FileNotFoundException e) {
-
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 	private static void crearScriptUser() {

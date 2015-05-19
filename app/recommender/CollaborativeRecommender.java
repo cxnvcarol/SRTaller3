@@ -114,7 +114,7 @@ public class CollaborativeRecommender {
         FileDataModel dataModel2 = null;
         try {
             //dataModel=new FileDataModel(new File(RATINGS_PATH),",");
-        	dataModel2=new FileDataModel(new File(RATINGS_PATH),"::");
+        	//dataModel2=new FileDataModel(new File(RATINGS_PATH),"::");
         	
             BufferedReader br = new BufferedReader(new FileReader(new File(RATINGS_PATH)));
             PrintWriter pw = new PrintWriter(new File(RATINGS_PATH_OUT));
@@ -149,8 +149,6 @@ public class CollaborativeRecommender {
             System.out.println("num users: "+nusers);
 
             System.out.println("Original model_____");
-            System.out.println("num items: "+dataModel2.getNumItems());
-            System.out.println("num users: "+dataModel2.getNumUsers());
 
         } catch (TasteException e) {
             e.printStackTrace();

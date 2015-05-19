@@ -56,7 +56,6 @@ public class Application extends Controller {
 
     public static Result searchGet()
     {
-    	MovieLoader.crearScriptMovie();
         String msg="";
         DynamicForm data = Form.form().bindFromRequest();
         String user_id="";

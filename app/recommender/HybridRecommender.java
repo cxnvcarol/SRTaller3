@@ -36,7 +36,7 @@ public class HybridRecommender {
     	contenido =  ContentRecommender.getInstance();
     }
 
-    public static ArrayList<Recommendation> recommend(User user, long timestamp)
+    public static ArrayList<Recommendation> recommend(User user, long timestamp)//timestamp is the selected date
     {
         if(user==null)
         {
@@ -46,7 +46,7 @@ public class HybridRecommender {
     	//TODO reponderar modelos
     	ArrayList<Recommendation> collabRecs = getCollaborativeRecommendations( user==null?0:user.user_id, timestamp);
         //ArrayList<Recommendation> collabRecs =new ArrayList<>();
-    	ArrayList<Recommendation> contentRecs = getContentRecommendations(user);
+    	ArrayList<Recommendation> contentRecs = getContentRecommendations(user,timestamp);
         
     	ArrayList<Recommendation> finalRecs = new ArrayList<Recommendation>();
     	int ultimaPos=collabRecs.size()+contentRecs.size();
@@ -154,12 +154,12 @@ public class HybridRecommender {
 		}
 	}
 
-	private static ArrayList<Recommendation> getContentRecommendations(User user) {
+	private static ArrayList<Recommendation> getContentRecommendations(User user, long timestamp) {
 		ArrayList<Recommendation> returned = new ArrayList<Recommendation>();
 //    	
 
-        //TODO
-        returned=contenido.recommend(user);
+        //TODO create many recommenders as feature types, recommend for each
+        returned=contenido.recommend(user,timestamp);
     	return returned;
 	}
 
