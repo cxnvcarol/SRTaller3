@@ -132,6 +132,27 @@ public class DataLoader {
             newM.save();
         }
         br.close();
+
+        br = new BufferedReader(new FileReader("./data/MappingDBpedia2Movielens.tsv"));
+        String line;
+        while((line = br.readLine()) != null){
+            String[] partes = line.split("	"); // id,nombre,uri
+            long movie_id = Long.parseLong(partes[0]);
+
+            Movie searched = Movie.find.byId(movie_id);
+            if(searched!=null)
+            {
+                String dbpediaURI = partes[2];
+
+                dbpediaURI = dbpediaURI.replace("resource", "data");
+                dbpediaURI += ".rdf";
+
+                searched.dbpedia_uri = dbpediaURI;
+                searched.save();
+
+            }
+            else System.out.println("Movie not found: "+movie_id);
+        }
     }
 
     private static void generateContentModel() {

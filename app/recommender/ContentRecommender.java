@@ -4,10 +4,7 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.SqlRow;
 import models.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by carol on 15/05/15.
@@ -21,20 +18,38 @@ public class ContentRecommender {
         this.maxRecommendations = maxRecommendations;
     }
 
+    public ContentRecommender()
+    {
+        MAX_REVIEWED=2000;
+        maxRecommendations=20;
+    }
+    public void setMAX_REVIEWED(int p)
+    {
+        MAX_REVIEWED=p;
+    }
     public static ContentRecommender getInstance() {
         if(instance==null)
             instance=new ContentRecommender();
         return instance;
     }
 
-    public ArrayList<Recommendation> recommend(User user) {
+    public ArrayList<Recommendation> recommend(User user, long timestamp) {
         long t1=System.currentTimeMillis();
-        Feature[] cs = new Feature[0];
+
+        Feature[] cs=new Feature[0];
 
         if (user != null) {
             user.updateFeatures();
-            cs = user.features.toArray(new Feature[user.features.size()]);
+            List<UserFeatureRating> rr = user.features;
+            cs=new Feature[user.features.size()];
+            for (int i = 0; i < rr.size(); i++)
+            {
+                cs[i]=rr.get(i).feature;
+            }
+            //TODO use rating for pearson similarity
         }
+
+
         ArrayList<Recommendation> returned = new ArrayList<Recommendation>();
 
         if(cs.length>0)
@@ -44,9 +59,17 @@ public class ContentRecommender {
             int i=0;
             for (i = 0; i < similB.length&&i<MAX_REVIEWED; i++)
             {
-                List<Feature> clist = Movie.find.byId(bids[i]).features;
-                Feature[] cl2 = clist.toArray(new Feature[clist.size()]);
-                similB[i][1]=getJaccardSimilarity(cl2,cs);
+                //List<Feature> clist = Movie.find.byId(bids[i]).features;
+                Movie mov=Ebean.find(Movie.class).fetch("features").setId(bids[i]).findUnique();
+                //TODO porqué hay películas nulas??
+                if(mov!=null)
+                {
+                    List<Feature> clist=mov.features;
+                    Feature[] cl2 = clist.toArray(new Feature[clist.size()]);
+                    similB[i][1]=getJaccardSimilarity(cl2,cs);
+
+                }
+                similB[i][1]=(double)0;
                 similB[i][0]=(double)i;
             }
             for (; i < similB.length; i++)
@@ -81,46 +104,23 @@ public class ContentRecommender {
 
     public double getJaccardSimilarity(long[] c1,long[] c2)
     {
-        int cojoin=0,cot=0;
-        if(c1.length==0|| c2.length==0)
+        Set<Long> s0 = new HashSet<Long>(asList(c1));
+        Set<Long> s1 = new HashSet<Long>(asList(c1));
+        Set<Long> s2 = new HashSet<Long>(asList(c2));
+        s1.retainAll(s2);
+
+
+        Long[] result = s1.toArray(new Long[s1.size()]);
+
+        int total=s2.size();
+        Iterator<Long> iter = s0.iterator();
+        while(iter.hasNext())
         {
-            return 0;
+            if(!s2.contains(iter.next()))
+                total++;
         }
-        String completeQuery="select count(*) as co from category where ";
-        String where1= "where genre_id=3 or genre_id=4";
-        String where2="where genre_id=3 or genre_id=4";
 
-        if(c1.length>0)
-        {
-            where1=" where ";
-            String tqWhere="";
-            for (int i = 0; i < c1.length; i++) {
-                tqWhere+= " or genre_id=" + c1[i];
-            }
-            where1+=tqWhere.substring(3);
-
-            completeQuery+=tqWhere.substring(3);
-        }
-        if(c2.length>0)
-        {
-            where2=" where ";
-            String tqWhere="";
-            for (int i = 0; i < c2.length; i++) {
-                tqWhere+=" or genre_id="+c2[i];
-            }
-
-            where2+=tqWhere.substring(3);
-            if(completeQuery.contains("where"))
-                completeQuery+=tqWhere;
-            else
-                completeQuery+=tqWhere.substring(3);
-        }
-        String queryJoin="select count(*) co from (select genre_id cid from category"+where1+") c2 join category on cid=genre_id "+where2;
-
-        cot = Ebean.createSqlQuery(completeQuery).findList().get(0).getInteger("co");
-        cojoin= Ebean.createSqlQuery(queryJoin).findList().get(0).getInteger("co");
-
-        return (double)cojoin/(double)cot;
+        return (double)result.length/(double)total;
     }
     public double getJaccardSimilarity(Feature[] c1, Feature[]  c2)
     {
@@ -135,6 +135,14 @@ public class ContentRecommender {
                 cs2[i]=c2[i].getID();
         }
         return getJaccardSimilarity(cs1,cs2);
+    }
+
+    public List<Long> asList(final long[] is)
+    {
+        return new AbstractList<Long>() {
+            public Long get(int i) { return is[i]; }
+            public int size() { return is.length; }
+        };
     }
 
     public EvaluationResult evaluate (boolean radio,int maxBusinessNeighb, double trainingPercentage, int nUsers,int maxrec)
@@ -205,7 +213,7 @@ public class ContentRecommender {
                 else System.err.println("Trying use an unknown feature...");
             }
             theQuery+=tqWhere.substring(1);
-            theQuery+=") order by rand() limit "+MAX_REVIEWED;
+            theQuery+=") and (select count(*) cc from movie where id=movie_id)>0 order by rand() limit "+MAX_REVIEWED;
         }
 
         List<SqlRow> re = Ebean.createSqlQuery(theQuery).findList();

@@ -28,6 +28,7 @@ public class MovieLoader {
 	public static void main(String[] args) {
 		 //crearScriptFeature();
 		 crearRatingsScript();
+		// crearScriptFeature();
 		//crearScriptMovie();
 		// crearScriptFeatureMovie();
 		// crearScriptUser();
