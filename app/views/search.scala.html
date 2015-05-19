@@ -4,9 +4,14 @@
 @main(msg,"Hybrid Recommender",us) {
 
 
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
     <h1 class="text-center center-block">Las películas para tí</h1>
     <form id="searchForm" method="GET" action="/search">
+		<p align="center">Desde: <input type="text" name="datefield" id="datepicker">
         <input type="hidden" name="user_id" value="@if(us!=null){@us.user_id}" />
+    <button id="btn_search" type="submit">Recomendar</button></p>
     <section id="categories_section">
 
     </section>
@@ -43,9 +48,14 @@
     </div>
     <br/>
 
-
+<script>
+	
+  $(function() {
+    $( "#datepicker" ).datepicker();
+  });
+  </script>
     <script type="text/javascript">
-
+	
     function split(val) {
     return val.split(/,\s*/);
     }

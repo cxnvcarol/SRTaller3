@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -25,6 +26,7 @@ public class MovieLoader {
 	public static void main(String[] args) {
 		//crearScriptFeature();
 		crearScriptFeatureMovie();
+		crearScriptUser();
 //		try {
 //			PrintWriter pwMovieOutput = new PrintWriter(new File(
 //					movies_output), "UTF-8");
@@ -41,6 +43,33 @@ public class MovieLoader {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
+	}
+
+	private static void crearScriptUser() {
+		try {
+			PrintWriter pw = new PrintWriter(new File("./data/users.sql"));
+			BufferedReader br = new BufferedReader(new FileReader("./data/ratings.dat"));
+			String ln;
+			ArrayList<String> users = new ArrayList<String>();
+			while((ln=br.readLine())!=null){
+				String[] linea = ln.split("::");
+				if(!users.contains(linea[0])){
+					users.add(linea[0]);
+				}
+			}
+			br.close();
+			for(String u :users){
+				pw.println("insert into user values (\""+u+"\");");
+			}
+			pw.close();
+		} catch (FileNotFoundException e) {
+			
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private static void crearScriptFeatureMovie() {

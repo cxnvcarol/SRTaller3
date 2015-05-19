@@ -14,7 +14,11 @@ import views.html.*;
 import recommender.*;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Application extends Controller {
@@ -83,9 +87,25 @@ public class Application extends Controller {
         else
             msg+="\nWithout user";
 
-
+        //TODO
+        long timestamp=0;
+        String fecha = data.get("datefield");
+        if(fecha!=null){
+        	DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        	Date date = null;
+			try {
+				date = dateFormat.parse(fecha);
+			} catch (ParseException e) {
+	            msg+="\nCould not parse date";
+			}
+        	timestamp = date.getTime();
+        	
+        }
+        else
+            msg+="\nWithout date";
+                
         List<Recommendation> items = new ArrayList<Recommendation>();
-        items=HybridRecommender.getInstance().recommend(logged);
+        items=HybridRecommender.getInstance().recommend(logged, timestamp);
 
 
         return ok(search.render(msg,logged,items));

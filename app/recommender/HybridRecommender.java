@@ -36,7 +36,7 @@ public class HybridRecommender {
     	contenido =  ContentRecommender.getInstance();
     }
 
-    public static ArrayList<Recommendation> recommend(User user)
+    public static ArrayList<Recommendation> recommend(User user, long timestamp)
     {
         if(user==null)
         {
@@ -44,7 +44,7 @@ public class HybridRecommender {
         }
 
     	//TODO reponderar modelos
-    	ArrayList<Recommendation> collabRecs = getCollaborativeRecommendations( user==null?0:user.user_id);
+    	ArrayList<Recommendation> collabRecs = getCollaborativeRecommendations( user==null?0:user.user_id, timestamp);
         //ArrayList<Recommendation> collabRecs =new ArrayList<>();
     	ArrayList<Recommendation> contentRecs = getContentRecommendations(user);
         
@@ -163,14 +163,15 @@ public class HybridRecommender {
     	return returned;
 	}
 
-	private static ArrayList<Recommendation> getCollaborativeRecommendations(long user_id) {
+	private static ArrayList<Recommendation> getCollaborativeRecommendations(long user_id, long timestamp) {
         //TODO
 		int neighbors = 10;
 		int similarityMethod = CollaborativeRecommender.EUCLIDEAN;
 
         if(user_id==0)
             return new ArrayList<Recommendation>();
-		return colaborativo.executeRecommender(user_id, (int)CollaborativeRecommender.MAX_RECOMMENDATIONS, neighbors, similarityMethod, 1000000000);
+        //TODO timestamp
+		return colaborativo.executeRecommender(user_id, (int)CollaborativeRecommender.MAX_RECOMMENDATIONS, neighbors, similarityMethod, 100000000);
 	}
 
 	public static EvaluationResult evaluate (double radioLoc,String hour, double trainingPercentage,int evalMethod)
