@@ -28,8 +28,13 @@ public class HybridRecommender {
     private static CollaborativeRecommender colaborativo;
     private static ContentRecommender contenido;
     public static final int MAX_RECOMMENDATIONS = 20;
+    public static double wSubject=0.5;
+    public static double wStarring=0.5;
+    public static double wDirector=0.5;
+    public static double wGender=0.5;
 
-    
+
+
     public HybridRecommender()
     {
     	colaborativo = CollaborativeRecommender.getInstance();
@@ -67,7 +72,7 @@ public class HybridRecommender {
     		for( int j = 0 ; j<contentRecs.size() && !termino ; j ++){
     			Recommendation content = contentRecs.get(j);
     			
-    			if(content.getMovie()!=null){
+    			if(content!=null&&content.getMovie()!=null){
 	    			if(collab.getMovie().id==content.getMovie().id){
 	    				//Promedio de posicion entre las dos listas
 	    				posIntro = (i+j)/2;
@@ -159,9 +164,16 @@ public class HybridRecommender {
 		ArrayList<Recommendation> returned = new ArrayList<Recommendation>();
 //    	
 
-        contenido.setMaxRecommendations(4000);
+        contenido.setMaxRecommendations(40);
 
-        //TODO create many recommenders as feature types, recommend for each
+
+
+
+        contenido.setwSubject(wSubject);
+        contenido.setwDirector(wDirector);
+        contenido.setwGender(wGender);
+        contenido.setwStarring(wStarring);
+        //returned=contenido.recommendWeighted(user,timestamp);
         returned=contenido.recommend(user,timestamp);
     	return returned;
 	}
@@ -174,8 +186,8 @@ public class HybridRecommender {
         if(user_id==0)
             return new ArrayList<Recommendation>();
         //TODO Cuadrar esto!!!
-        return new ArrayList<Recommendation>();
-		//return colaborativo.executeRecommender(user_id, (int)CollaborativeRecommender.MAX_RECOMMENDATIONS, neighbors, similarityMethod, 100000000);
+        //return new ArrayList<Recommendation>();
+		return colaborativo.executeRecommender(user_id, (int)CollaborativeRecommender.MAX_RECOMMENDATIONS, neighbors, similarityMethod, 100000000);
 	}
 
 	public static EvaluationResult evaluate (double radioLoc,String hour, double trainingPercentage,int evalMethod)

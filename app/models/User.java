@@ -12,6 +12,7 @@ import com.avaje.ebean.Filter;
 import com.avaje.ebean.SqlRow;
 import com.avaje.ebean.annotation.ConcurrencyMode;
 import com.avaje.ebean.annotation.EntityConcurrencyMode;
+import controllers.Application;
 import play.db.ebean.Model;
 
 /**
@@ -53,11 +54,11 @@ public class User extends Model{
 
     public void updateFeatures()
     {
-        if(features.size()>0)
-            return;
+        features=new ArrayList<>();
         List<Rating> myratings =
                 Ebean.find(Rating.class)
                         .where().eq("userid", user_id)
+                        //.where().ge("timestamp", Application.timestamp)//TODO
                         .findList();
 
         for(Rating r:myratings)
@@ -96,5 +97,16 @@ public class User extends Model{
             features.add(fuser);
         }
         fuser.addRating(rating);
+    }
+
+    public List<UserFeatureRating> getFeatures(String typeFeature) {
+        ArrayList<UserFeatureRating> r=new ArrayList<>();
+        for (UserFeatureRating f:features)
+        {
+            if(f.feature.type.equals(typeFeature))
+                r.add(f);
+        }
+        return r;
+
     }
 }

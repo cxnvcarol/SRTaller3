@@ -1,5 +1,6 @@
 package models;
 
+import com.avaje.ebean.Ebean;
 import play.db.ebean.Model;
 
 import javax.persistence.*;
@@ -69,5 +70,15 @@ public class Movie extends Model implements  Comparable<Movie>{
 
         }
         else return 0;
+    }
+
+    public List<Feature> getFeatures(String typeFeature) {
+        ArrayList<Feature> r=new ArrayList<>();
+        for (Feature f:features)
+        {
+            if(f.type.equals(typeFeature))
+                r.add(f);
+        }
+        return r;
     }
 }

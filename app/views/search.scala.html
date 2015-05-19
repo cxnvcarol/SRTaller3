@@ -1,4 +1,4 @@
-@(msg:String,us:User,items:List[Recommendation])
+@(msg:String,us:User,items:List[Recommendation],pesos:List[Double])
 @import play.api.libs.json.Json
 
 @main(msg,"Hybrid Recommender",us) {
@@ -17,22 +17,23 @@
     </section>
     <br/>
 
+        </form>
+
+
     <div id="model_preferences" class="text-center">
         <h4>¿Aún no? refina tus preferencias:</h4>
-<form id="form_update_prefs" method="post" action="/updatePrefs">
-        <div id="preferences_list">
-            <label for="director">Director: </label><input type="range" name="director" id="director" min="0" max="100" value="50"/><br/>
-            <label for="gender">Gender: </label><input type="range" name="gender" id="gender" min="0" max="100" value="50"/><br/>
-            <label for="subject">Subject: </label><input type="range" name="subject" id="subject" min="0" max="100" value="50"/><br/>
-            <label for="starring">Starring: </label><input type="range" name="starring" id="starring" min="0" max="100" value="50"/><br/>
+        <form id="form_update_prefs" method="post" action="/updatePrefs">
+            <div id="preferences_list">
+                <label for="director">Director: </label><input type="range" name="director" id="director" min="0" max="100" value="@pesos(0)"/><br/>
+                <label for="gender">Gender: </label><input type="range" name="gender" id="gender" min="0" max="100" value="@pesos(1)"/><br/>
+                <label for="subject">Subject: </label><input type="range" name="subject" id="subject" min="0" max="100" value="@pesos(2)"/><br/>
+                <label for="starring">Starring: </label><input type="range" name="starring" id="starring" min="0" max="100" value="@pesos(3)"/><br/>
 
-        </div>
+            </div>
 
-        <input type="submit" id="btn_update_prefs" value="Actualizar preferencias"></input>
-</form>
-    </div>
-
+            <input type="submit" id="btn_update_prefs" value="Actualizar preferencias"/>
         </form>
+    </div>
     <div id="results">
         <table class="table center-simple">
             <thead>

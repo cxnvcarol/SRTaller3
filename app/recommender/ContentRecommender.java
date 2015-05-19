@@ -14,6 +14,58 @@ public class ContentRecommender {
     private static ContentRecommender instance;
     private int maxRecommendations;
 
+
+    private double wDirector;
+    private double wGender;
+
+    public int getMAX_REVIEWED() {
+        return MAX_REVIEWED;
+    }
+
+    public static void setInstance(ContentRecommender instance) {
+        ContentRecommender.instance = instance;
+    }
+
+    public int getMaxRecommendations() {
+        return maxRecommendations;
+    }
+
+    public double getwDirector() {
+        return wDirector;
+    }
+
+    public void setwDirector(double wDirector) {
+        this.wDirector = wDirector;
+    }
+
+    public double getwGender() {
+        return wGender;
+    }
+
+    public void setwGender(double wGender) {
+        this.wGender = wGender;
+    }
+
+    public double getwSubject() {
+        return wSubject;
+    }
+
+    public void setwSubject(double wSubject) {
+        this.wSubject = wSubject;
+    }
+
+    public double getwStarring() {
+        return wStarring;
+    }
+
+    public void setwStarring(double wStarring) {
+        this.wStarring = wStarring;
+    }
+
+    private double wSubject;
+    private double wStarring;
+
+
     public void setMaxRecommendations(int maxRecommendations) {
         this.maxRecommendations = maxRecommendations;
     }
@@ -22,6 +74,10 @@ public class ContentRecommender {
     {
         MAX_REVIEWED=4000;
         maxRecommendations=20;
+        wDirector=0.5;
+        wGender=0.5;
+        wSubject=0.5;
+        wStarring=0.5;
     }
     public void setMAX_REVIEWED(int p)
     {
@@ -32,6 +88,128 @@ public class ContentRecommender {
             instance=new ContentRecommender();
         return instance;
     }
+
+    public ArrayList<Recommendation> recommendWeighted(User user, long timestamp) {
+
+        long t1=System.currentTimeMillis();
+
+        Feature[] cs=new Feature[0];
+
+        if (user != null) {
+            user.updateFeatures();
+            List<UserFeatureRating> rr = user.features;
+            cs=new Feature[user.features.size()];
+            for (int i = 0; i < rr.size(); i++)
+            {
+                cs[i]=rr.get(i).feature;
+            }
+            //TODO use rating for pearson similarity
+        }
+
+
+        ArrayList<Recommendation> returned = new ArrayList<Recommendation>();
+
+
+        if(cs.length>0)
+        {
+            long[] bids=getAllPosibleSimilarMovies(cs);
+            Double[][] similB=new Double[bids.length][2];
+            int i=0;
+
+
+            double[] jacD=new double[bids.length],jacG=new double[bids.length],jacS=new double[bids.length],jacSt=new double[bids.length];
+            double jacDMax=0,jacGMax=0,jacSMax=0,jacStMax=0;
+
+            for (i = 0; i < similB.length&&i<MAX_REVIEWED; i++)
+            {
+                //List<Feature> clist = Movie.find.byId(bids[i]).features;
+                Movie mov=Ebean.find(Movie.class).fetch("features").setId(bids[i]).findUnique();
+
+                if(mov!=null)
+                {
+                    //director
+                    List<Feature> clistD=mov.getFeatures("director");
+                    Feature[] cl2 = clistD.toArray(new Feature[clistD.size()]);
+                    List<UserFeatureRating> rr = user.getFeatures("director");
+                    Feature[] cuser = new Feature[rr.size()];
+                    for (int j = 0; j < rr.size(); j++)
+                    {
+                        cuser[j]=rr.get(j).feature;
+                    }
+                    jacD[i]=getJaccardSimilarity(cl2,cuser);
+                    if(jacD[i]>jacDMax)
+                        jacDMax=jacD[i];
+
+
+                    //gender
+                    clistD=mov.getFeatures("gender");
+                    cl2 = clistD.toArray(new Feature[clistD.size()]);
+                    rr = user.getFeatures("gender");
+                    cuser = new Feature[rr.size()];
+                    for (int j = 0; j < rr.size(); j++)
+                    {
+                        cuser[j]=rr.get(j).feature;
+                    }
+                    jacG[i]=getJaccardSimilarity(cl2,cuser);
+                    if(jacG[i]>jacGMax)
+                        jacGMax=jacG[i];
+
+                    //subject
+                    clistD=mov.getFeatures("subject");
+                    cl2 = clistD.toArray(new Feature[clistD.size()]);
+                    rr = user.getFeatures("subject");
+                    cuser = new Feature[rr.size()];
+                    for (int j = 0; j < rr.size(); j++)
+                    {
+                        cuser[j]=rr.get(j).feature;
+                    }
+                    jacG[i]=getJaccardSimilarity(cl2,cuser);
+                    if(jacG[i]>jacGMax)
+                        jacGMax=jacG[i];
+
+                    //starring
+                    clistD=mov.getFeatures("starring");
+                    cl2 = clistD.toArray(new Feature[clistD.size()]);
+                    rr = user.getFeatures("starring");
+                    cuser = new Feature[rr.size()];
+                    for (int j = 0; j < rr.size(); j++)
+                    {
+                        cuser[j]=rr.get(j).feature;
+                    }
+                    jacG[i]=getJaccardSimilarity(cl2,cuser);
+                    if(jacG[i]>jacGMax)
+                        jacGMax=jacG[i];
+
+                }
+                else similB[i][1]=(double)0;
+                similB[i][0]=(double)i;
+            }
+
+            for (i = 0; i < similB.length&&i<MAX_REVIEWED; i++)
+            {
+                similB[i][1]=ponderado(jacD[i],jacG[i],jacS[i],jacSt[i],jacDMax,jacGMax,jacSMax,jacStMax);
+            }
+
+
+            Double[][] ordered=orderAll(similB);
+            double maxJaccard=ordered[0][1];
+
+            for (int j = 0; j < maxRecommendations &&j<bids.length; j++) {
+                Recommendation r = new Recommendation();
+                int index=ordered[j][0].intValue();
+                r.setMovie(Movie.find.byId(bids[index]));
+                r.setEstimatedRating(ordered[j][1]*5);
+                returned.add(r);
+            }
+        }
+        System.out.println("\n\n!!!HIGH ATTENTION HERE... RECOMMENDING BY CONTENT WEIGHTED TOOK "+(System.currentTimeMillis()-t1)+"ms!!!\n\n");
+        return returned;
+    }
+
+    private Double ponderado(double d, double g, double s, double st,double dm, double gm, double sm, double stm) {
+        return d/dm*wDirector+g/gm*wGender+s/sm*wSubject+st/stm*wStarring;
+    }
+
 
     public ArrayList<Recommendation> recommend(User user, long timestamp) {
         long t1=System.currentTimeMillis();
@@ -114,9 +292,14 @@ public class ContentRecommender {
 
     public double getJaccardSimilarity(long[] c1,long[] c2)
     {
+        if(c1.length==0||c2.length==0)
+            return 0;
+
         Set<Long> s0 = new HashSet<Long>(asList(c1));
         Set<Long> s1 = new HashSet<Long>(asList(c1));
         Set<Long> s2 = new HashSet<Long>(asList(c2));
+
+
         s1.retainAll(s2);
 
 

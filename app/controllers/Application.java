@@ -5,6 +5,7 @@ import com.avaje.ebean.SqlRow;
 import models.Movie;
 import models.Recommendation;
 import models.User;
+import oauth.signpost.http.HttpResponse;
 import org.json.simple.JSONObject;
 import play.data.DynamicForm;
 import play.data.Form;
@@ -22,6 +23,8 @@ import java.util.Date;
 import java.util.List;
 
 public class Application extends Controller {
+
+    public static long timestamp;
 
     public static User getLoggedUser()
     {
@@ -109,8 +112,12 @@ public class Application extends Controller {
         List<Recommendation> items = new ArrayList<Recommendation>();
         items=HybridRecommender.getInstance().recommend(logged, timestamp);
 
-
-        return ok(search.render(msg,logged,items));
+        List<Double> pesos=new ArrayList<>();
+        pesos.add(HybridRecommender.wDirector*100);
+        pesos.add(HybridRecommender.wGender*100);
+        pesos.add(HybridRecommender.wSubject*100);
+        pesos.add(HybridRecommender.wStarring*100);
+        return ok(search.render(msg,logged,items,pesos));
 
     }
     public static Result getMovie(String id) {
@@ -130,8 +137,49 @@ public class Application extends Controller {
     }
 
     public static Result updatePrefs() {
-        //todo
-        return Results.TODO;
+        DynamicForm data = Form.form().bindFromRequest();
+        double director=0.5,gender=0.5,subject=0.5,starring=0.5;
+        try
+        {
+            director=Double.parseDouble(data.get("director"));
+        }
+        catch(Exception e)
+        {
+        }
+
+        try{
+
+            gender=Double.parseDouble(data.get("gender"));
+
+        }
+        catch (Exception e)
+        {
+
+        }
+
+        try{
+
+            subject=Double.parseDouble(data.get("subject"));
+        }
+        catch (Exception e)
+        {
+
+        }
+
+        try{
+
+            starring=Double.parseDouble(data.get("starring"));
+        }
+        catch (Exception e)
+        {
+
+        }
+        HybridRecommender.wDirector=director/100;
+        HybridRecommender.wGender=gender/100;
+        HybridRecommender.wStarring=starring/100;
+        HybridRecommender.wSubject=subject/100;
+
+        return redirect("/");
     }
 }
 
