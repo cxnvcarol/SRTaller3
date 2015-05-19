@@ -127,5 +127,10 @@ public class Application extends Controller {
         }
         return ok("Data loading adressed...");
     }
+
+    public static Result updatePrefs() {
+        //todo
+        return Results.TODO;
+    }
 }
 

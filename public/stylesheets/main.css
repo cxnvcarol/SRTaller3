@@ -1,7 +1,9 @@
 #model_preferences
 {
-    display: none;
-    width: 0;
+    /*display: none;
+    width: 0;*/
+    width: 20%;
+    float: left;
 }
 
 /* custom css*/
@@ -61,7 +63,7 @@ ul.tagit{
 }
 
 #results>table{
-    width:60%
+    width:90%
 }
 
 .center-simple{
@@ -89,5 +91,5 @@ label[for="userid"],input[name="userid"]
 }
 #results{
     float:right;
-    width:90%
+    width:70%
 }

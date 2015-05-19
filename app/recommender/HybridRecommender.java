@@ -44,6 +44,7 @@ public class HybridRecommender {
         }
 
     	//TODO reponderar modelos
+        //el colaborativo debería sólo ordenar los datos del de contenido... digo yo..
     	ArrayList<Recommendation> collabRecs = getCollaborativeRecommendations( user==null?0:user.user_id, timestamp);
         //ArrayList<Recommendation> collabRecs =new ArrayList<>();
     	ArrayList<Recommendation> contentRecs = getContentRecommendations(user,timestamp);
@@ -102,7 +103,8 @@ public class HybridRecommender {
 //    		System.out.println(finalRecs.get(i).movie.title);
 //    	}
 //    	return finalRecs;
-        return collabRecs;
+        //return collabRecs;
+        return contentRecs;
     }
 
     private static ArrayList<Recommendation> popularMovies(int maxRecommendations) {
@@ -156,7 +158,9 @@ public class HybridRecommender {
 
 	private static ArrayList<Recommendation> getContentRecommendations(User user, long timestamp) {
 		ArrayList<Recommendation> returned = new ArrayList<Recommendation>();
-//    	
+//
+
+        contenido.setMaxRecommendations(4000);
 
         //TODO create many recommenders as feature types, recommend for each
         returned=contenido.recommend(user,timestamp);
@@ -170,8 +174,9 @@ public class HybridRecommender {
 
         if(user_id==0)
             return new ArrayList<Recommendation>();
-        //TODO timestamp
-		return colaborativo.executeRecommender(user_id, (int)CollaborativeRecommender.MAX_RECOMMENDATIONS, neighbors, similarityMethod, 100000000);
+        //TODO Cuadrar esto!!!
+        return new ArrayList<Recommendation>();
+		//return colaborativo.executeRecommender(user_id, (int)CollaborativeRecommender.MAX_RECOMMENDATIONS, neighbors, similarityMethod, 100000000);
 	}
 
 	public static EvaluationResult evaluate (double radioLoc,String hour, double trainingPercentage,int evalMethod)

@@ -11,6 +11,7 @@ GET        /randomuser          controllers.Application.randomUserId()
 
 GET        /movie/:id           controllers.Application.getMovie(id: String)
 GET        /loadall             controllers.Application.loadAll()
+POST       /updatePrefs         controllers.Application.updatePrefs()
 
 
 

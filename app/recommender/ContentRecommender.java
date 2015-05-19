@@ -20,7 +20,7 @@ public class ContentRecommender {
 
     public ContentRecommender()
     {
-        MAX_REVIEWED=2000;
+        MAX_REVIEWED=4000;
         maxRecommendations=20;
     }
     public void setMAX_REVIEWED(int p)
@@ -69,7 +69,7 @@ public class ContentRecommender {
                     similB[i][1]=getJaccardSimilarity(cl2,cs);
 
                 }
-                similB[i][1]=(double)0;
+                else similB[i][1]=(double)0;
                 similB[i][0]=(double)i;
             }
             for (; i < similB.length; i++)
@@ -78,16 +78,26 @@ public class ContentRecommender {
                 similB[i][0]=(double)i;
             }
             Double[][] ordered=orderAll(similB);
+            double maxJaccard=ordered[0][1];
 
             for (int j = 0; j < maxRecommendations &&j<bids.length; j++) {
                 Recommendation r = new Recommendation();
                 int index=ordered[j][0].intValue();
                 r.setMovie(Movie.find.byId(bids[index]));
-                r.setEstimatedRating(ordered[j][1]*5);
+                r.setEstimatedRating(ordered[j][1]/maxJaccard*5);
                 returned.add(r);
             }
         }
         System.out.println("\n\n!!!HIGH ATTENTION HERE... RECOMMENDING BY CONTENT TOOK "+(System.currentTimeMillis()-t1)+"ms!!!\n\n");
+        return returned;
+    }
+
+    private Double[][] normalizar(Double[][] orderedPre, double maxVal) {
+        Double[][] returned = new Double[orderedPre.length][2];
+        for (int i = 0; i < returned.length; i++) {
+            returned[i][0]=orderedPre[i][0];
+            returned[i][1]=orderedPre[i][1]/maxVal;
+        }
         return returned;
     }
 
@@ -120,7 +130,8 @@ public class ContentRecommender {
                 total++;
         }
 
-        return (double)result.length/(double)total;
+        double simil=(double)result.length/(double)total;
+        return simil;
     }
     public double getJaccardSimilarity(Feature[] c1, Feature[]  c2)
     {
